@@ -7,12 +7,32 @@ import LogoutButton from "@/components/LogoutButton";
 import Modal from "react-modal";
 import Image from "next/image";
 
-import { NormalizedPart, Part, Product } from "@/lib/types";
+import {NormalizedPart, ProductImage} from "@/lib/types";
 import {
     deleteFromCloudinary,
     getPublicIdFromUrl,
     uploadToCloudinary,
 } from "@/lib/cloudinary";
+
+interface RawPart {
+    id: number;
+    make?: string;
+    model?: string;
+    year_start?: number;
+    year_end?: number;
+    slug?: string;
+    name?: string;
+    category?: string;
+    price?: number;
+    stars?: number | null;
+    stock_status?: boolean;
+    image_url?: string;
+    warranty?: number;
+    delivery_days?: number;
+    return_days?: number;
+    description?: string;
+    images?: ProductImage[];
+}
 
 const CATEGORY_OPTIONS = [
     "Body Parts",
@@ -72,7 +92,7 @@ export default function PartsAdminPage() {
         const json = await res.json();
         const data = Array.isArray(json) ? json : json.results || [];
 
-        const normalized: NormalizedPart[] = data.map((item: any) => ({
+        const normalized: NormalizedPart[] = data.map((item: RawPart) => ({
             id: item.id,
             make: item.make ?? "",
             model: item.model ?? "",
@@ -181,7 +201,7 @@ export default function PartsAdminPage() {
     async function createPart(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
-        let imagesUrls: string[] = [];
+        const imagesUrls: string[] = [];
 
         if (form.imagesFiles?.length) {
             for (const file of form.imagesFiles) {

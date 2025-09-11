@@ -1,18 +1,15 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import Image from "next/image";
 import { useCart } from '@/components/CartContext';
 import { useWishlist } from '@/components/WishlistContext';
-import LoadingFallback from "@/components/ui/LoadingFallback";
 import NavbarHome from "@/components/NavbarHome";
 import Check from "@/public/icons/Check";
 import { Star, ShoppingCart, Heart } from "lucide-react";
 import { Product, ProductImage } from "@/lib/types";
 
 export default function ProductDetailsClient({ product }: { product: Product }) {
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [quantity, setQuantity] = useState(1);
     const [selectedTab, setSelectedTab] = useState("Reviews");
@@ -24,13 +21,25 @@ export default function ProductDetailsClient({ product }: { product: Product }) 
     const handleAddToCart = () => product && addToCart(product, quantity);
     const handleWishlist = () => {
         if (!product) return;
-        isWishlisted(product.id) ? removeFromWishlist(product.id) : addToWishlist(product);
+
+        if (isWishlisted(product.id)) {
+            removeFromWishlist(product.id);
+        } else {
+            addToWishlist(product);
+        }
     };
-    const renderStars = (rating: number) =>
-        Array.from({length: 5}).map((_, i) => (
-            <Star key={i}
-                  className={`w-4 h-4 ${i < Math.floor(rating) ? "text-yellow-400 fill-current" : "text-gray-300"}`}/>
-        ));
+    const renderStars = (rating: number) => (
+        <>
+            {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                    key={i}
+                    className={`w-4 h-4 ${
+                        i < Math.floor(rating) ? "text-yellow-400 fill-current" : "text-gray-300"
+                    }`}
+                />
+            ))}
+        </>
+    );
 
     const wishlisted = isWishlisted(product.id);
 

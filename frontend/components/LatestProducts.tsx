@@ -109,7 +109,11 @@ const LatestProducts: React.FC<LatestProductsProps> = ({
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                wishlisted ? removeFromWishlist(product.id) : addToWishlist(product);
+                                                if (wishlisted) {
+                                                    removeFromWishlist(product.id);
+                                                } else {
+                                                    addToWishlist(product);
+                                                }
                                             }}
                                             className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 ${
                                                 wishlisted

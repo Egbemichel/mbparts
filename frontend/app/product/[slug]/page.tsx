@@ -1,11 +1,16 @@
-// app/product/[slug]/page.tsx  (server component)
+// app/product/[slug]/page.tsx (server component)
 import ProductDetailsClient from "./ProductDetailsClient";
 import { Product } from "@/lib/types";
 import { Metadata } from "next";
 
+interface ProductPageProps {
+  params: Promise<{ slug: string }>;
+}
+
 // Generate dynamic metadata for each product
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/parts/parts/${params.slug}/`, { cache: "no-store" });
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/parts/parts/${slug}/`, { cache: "no-store" });
 
   if (!res.ok) {
     return {
@@ -42,8 +47,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function ProductDetailsPage({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export default async function ProductDetailsPage({ params }: ProductPageProps) {
+  const { slug } = await params;
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/parts/parts/${slug}/`, {
     cache: "no-store",
