@@ -52,7 +52,7 @@ const defaultNavItems: NavItem[] = [
 ];
 
 const SecondaryNav: React.FC<SecondaryNavProps> = ({
-                                                       phoneNumber = '(888) 910-2390',
+                                                       phoneNumber = '+1 (650) 431-7498',
                                                        navItems = defaultNavItems
                                                    }) => {
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);

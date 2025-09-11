@@ -278,17 +278,17 @@ const ContactSection: React.FC = () => {
         {
             icon: <Phone className="w-5 h-5" />,
             label: "Call Us",
-            value: "+1 (555) 123-4567"
+            value: "+1 (650) 431-7498"
         },
         {
             icon: <Mail className="w-5 h-5" />,
             label: "Email Us",
-            value: "info@autoparts.com"
+            value: "mbparts.assembly.store@gmail.com"
         },
         {
             icon: <MapPin className="w-5 h-5" />,
-            label: "Visit Us",
-            value: "2972 Westheimer Rd. Santa Ana, Illinois 85486"
+            label: "We are at",
+            value: "New Jersey, USA"
         }
     ];
 

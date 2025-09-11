@@ -228,9 +228,7 @@ const ContactPage = () => {
                                     <div>
                                         <div className="font-semibold text-gray-900 text-sm mb-1">Address</div>
                                         <div className="text-gray-600 text-sm leading-relaxed">
-                                            123 Business Street<br />
-                                            Suite 100<br />
-                                            City, State 12345<br />
+                                            New Jersey<br />
                                             United States
                                         </div>
                                     </div>
@@ -240,7 +238,7 @@ const ContactPage = () => {
                                     <Phone className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
                                     <div>
                                         <div className="font-semibold text-gray-900 text-sm mb-1">Phone</div>
-                                        <div className="text-gray-600 text-sm">+1 (555) 123-4567</div>
+                                        <div className="text-gray-600 text-sm">+1 (650) 431-7498</div>
                                     </div>
                                 </div>
 
@@ -248,7 +246,7 @@ const ContactPage = () => {
                                     <Mail className="w-5 h-5 text-green-600 mt-1 flex-shrink-0" />
                                     <div>
                                         <div className="font-semibold text-gray-900 text-sm mb-1">Email</div>
-                                        <div className="text-gray-600 text-sm">contact@business.com</div>
+                                        <div className="text-gray-600 text-sm">mbparts.assembly.store@gmail.com</div>
                                     </div>
                                 </div>
 
