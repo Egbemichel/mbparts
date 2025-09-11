@@ -56,7 +56,7 @@ const AutomotiveHero: React.FC = () => {
                                 <div className="flex-shrink-0">
                                     <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden">
                                         <Image
-                                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80"
+                                            src="/images/mbparts_logo.jpg"
                                             alt="Customer service specialist"
                                             className="w-full h-full object-cover"
                                             width={300}

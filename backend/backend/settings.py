@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "django.contrib.sites",
+    "django.contrib.sitemaps",
 
     # Third-party apps
     "rest_framework",
@@ -54,6 +56,7 @@ INSTALLED_APPS = [
     # Local apps
     "apps.parts.apps.PartsConfig",
 ]
+SITE_ID = 1
 
 
 

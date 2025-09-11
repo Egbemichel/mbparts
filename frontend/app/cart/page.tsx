@@ -16,11 +16,6 @@ export default function CartPage() {
     const handleRemove = (id: string) => removeFromCart(parseInt(id));
 
 
-    const handleMoveToFavorites = (id: string) => {
-        console.log('Move to favorites:', id);
-        // Implement favorite logic
-    };
-
     return (
         <div className="max-w-3xl mx-auto py-12 px-4 relative">
             {/* Go Back Button */}
@@ -46,9 +41,13 @@ export default function CartPage() {
                                 name={item.name}
                                 image={item.image_url ?? '/placeholder.png'}
                                 price={item.price}
+                                category={item.category}
+                                stock_status={item.stock_status}
+                                warranty={item.warranty}
+                                delivery_days={item.delivery_days}
+                                return_days={item.return_days}
                                 initialQuantity={item.quantity}
                                 onRemove={handleRemove}
-                                onMoveToFavorites={handleMoveToFavorites}
                             />
                         ))}
                     </div>

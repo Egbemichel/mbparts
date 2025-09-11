@@ -32,8 +32,8 @@ const StarRating: React.FC<{ rating: number; reviewCount: number }> = ({ rating,
 
 const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
     return (
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 flex flex-row items-center" style={{ width: 422, height: 168 }}>
-            <div className="h-full w-[140px] bg-gray-50 rounded-md flex items-center justify-center overflow-hidden">
+        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 flex flex-row items-center w-full min-h-[140px] max-w-full">
+            <div className="h-full w-28 sm:w-[140px] bg-gray-50 rounded-md flex items-center justify-center overflow-hidden flex-shrink-0">
                 <Image
                     src={product.image}
                     alt={product.title}
@@ -115,21 +115,20 @@ const TopPicks: React.FC = () => {
                 </button>
             </div>
             {/* Product Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
-                <div className="col-span-1 md:col-span-2 lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 w-full max-w-full overflow-x-hidden">
+                <div className="col-span-1 md:col-span-2 lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 w-full max-w-full">
                     {products.map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
                 </div>
                 {/* Promotional Banner */}
-                <div className="col-span-1 md:col-span-2 lg:col-span-1">
-                    <div className="bg-gradient-to-br from-gray-800 via-gray-900 to-black rounded-xl p-6 h-full min-h-[400px] relative overflow-hidden">
+                <div className="col-span-1 md:col-span-2 lg:col-span-1 w-full max-w-full">
+                    <div className="bg-gradient-to-br from-gray-800 via-gray-900 to-black rounded-xl p-6 h-full min-h-[400px] relative overflow-hidden w-full max-w-full">
                         <div className="relative z-10 text-white h-full flex flex-col justify-between">
                             <div className="text-right">
                                 <div className="text-sm font-medium mb-1">START FROM</div>
                                 <div className="text-3xl font-bold text-orange-500">$99</div>
                             </div>
-
                             <div className="space-y-4">
                                 <div>
                                     <div className="text-4xl font-bold leading-tight">
@@ -138,21 +137,18 @@ const TopPicks: React.FC = () => {
                                         YOU NEED
                                     </div>
                                 </div>
-
                                 <button onClick={() => router.push("/shop")} className="bg-white text-gray-900 px-6 py-3 rounded font-bold hover:bg-primary-30 transition-colors flex items-center gap-2 w-full justify-center">
                                     SHOP NOW
                                     <DoubleArrowRight className="w-4 h-4 text-primary-100" />
                                 </button>
                             </div>
                         </div>
-
                         {/* Background automotive parts images */}
-                        <div className="absolute inset-0">
+                        <div className="absolute inset-0 w-full h-full">
                             <Image
                                 src="/images/car-brake-disc.png"
                                 alt="Automotive parts background"
                                 className="w-full h-full object-cover opacity-30"
-                                fill
                                 width={150}
                                 height={150}
                             />

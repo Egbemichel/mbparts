@@ -1,6 +1,6 @@
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
-from rest_framework import viewsets, filters, status
+from rest_framework import viewsets, filters, status, generics
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -8,11 +8,21 @@ from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Part
-from .serializers import PartSerializer, PublicPartSerializer
+from .serializers import PartSerializer, PublicPartSerializer, PartsAdminDetailSerializer
 
 from .models import PartsAdmin
 from .serializers import PartsAdminSerializer
 from rest_framework.permissions import IsAuthenticated  # restrict to logged-in admin
+
+class ProductDetailView(generics.RetrieveAPIView):
+    queryset = PartsAdmin.objects.all()
+    serializer_class = PartsAdminDetailSerializer
+    lookup_field = "slug"
+
+class PartsDetailBySlug(generics.RetrieveAPIView):
+    queryset = PartsAdmin.objects.all()
+    serializer_class = PartsAdminSerializer
+    lookup_field = "slug"
 
 
 class PartsAdminViewSet(viewsets.ModelViewSet):

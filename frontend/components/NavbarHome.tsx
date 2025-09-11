@@ -11,15 +11,15 @@ import CartIcon from "@/public/icons/CartIcon";
 import SecondaryNav from "@/components/SecondaryNav";
 import DoubleArrowRight from "@/public/icons/DoubleArrowRight";
 import { useCart } from '@/components/CartContext';
+import { useWishlist } from '@/components/WishlistContext';
+import Image from 'next/image';
 
 interface HeaderProps {
-    wishlistItemCount?: number;
     isLoggedIn?: boolean;
     userEmail?: string;
 }
 
 const Header: React.FC<HeaderProps> = ({
-                                           wishlistItemCount = 0,
                                            isLoggedIn = false,
                                            userEmail = ""
                                        }) => {
@@ -35,6 +35,8 @@ const Header: React.FC<HeaderProps> = ({
     });
 
     const { cartCount } = useCart();
+    const { wishlist } = useWishlist();
+    const wishlistCount = wishlist.length;
 
     const handleVehicleChange = useCallback((key: string, value: string) => {
         setVehicle((prev) => ({ ...prev, [key]: value }));
@@ -157,15 +159,14 @@ const Header: React.FC<HeaderProps> = ({
                         {/* Logo */}
                         <div className="flex-shrink-0">
                             <Link href="/" className="flex items-center">
-                                <div className="bg-orange-500 rounded-full p-2 mr-2">
-                                    <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                                        <span className="text-orange-500 font-bold text-sm">K</span>
-                                    </div>
-                                </div>
-                                <span className="text-xl font-bold">
-                                <span className="text-gray-900">KAR</span>
-                                <span className="text-orange-500">PART</span>
-                            </span>
+                                <Image
+                                    src="/images/mbparts_logo.jpg"
+                                    alt="KARPART Logo"
+                                    width={65}
+                                    height={65}
+                                    className="mr-1"
+                                    priority
+                                />
                             </Link>
                         </div>
 
@@ -219,13 +220,13 @@ const Header: React.FC<HeaderProps> = ({
                                         aria-label="Wishlist"
                                     >
                                         <WishlistIcon/>
-                                        {wishlistItemCount > 0 && (
+                                        {wishlistCount > 0 && (
                                             <span
                                                 className="absolute -top-1 -right-1 bg-primary-50 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
-                                                {wishlistItemCount > 99 ? '99+' : wishlistItemCount}
+                                                {wishlistCount > 99 ? '99+' : wishlistCount}
                                             </span>
                                         )}
-                                        <span className="sr-only">{wishlistItemCount} items in wishlist</span>
+                                        <span className="sr-only">{wishlistCount} items in wishlist</span>
                                     </Link>
 
                                     {/* Cart Icon (mobile) */}
@@ -296,13 +297,13 @@ const Header: React.FC<HeaderProps> = ({
                                     aria-label="Wishlist"
                                 >
                                     <WishlistIcon/>
-                                    {wishlistItemCount > 0 && (
+                                    {wishlistCount > 0 && (
                                         <span
                                             className="absolute -top-1 -right-1 bg-primary-50 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
-                                        {wishlistItemCount > 99 ? '99+' : wishlistItemCount}
+                                        {wishlistCount > 99 ? '99+' : wishlistCount}
                                     </span>
                                     )}
-                                    <span className="sr-only">{wishlistItemCount} items in wishlist</span>
+                                    <span className="sr-only">{wishlistCount} items in wishlist</span>
                                 </Link>
 
                                 {/* Cart */}

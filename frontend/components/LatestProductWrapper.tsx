@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useState, useEffect, useMemo } from 'react';
 import LatestProductsOriginal from './LatestProducts';
 import { Product } from '@/lib/types';
@@ -18,7 +19,6 @@ const LatestProductsWrapper: React.FC<LatestProductsWrapperProps> = ({
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // stable API endpoint reference
     const endpoint = useMemo(() => `${process.env.NEXT_PUBLIC_API_URL}/parts/parts-public/`, []);
 
     useEffect(() => {
@@ -27,11 +27,9 @@ const LatestProductsWrapper: React.FC<LatestProductsWrapperProps> = ({
         async function fetchProducts() {
             setLoading(true);
             try {
-                const res = await fetch(endpoint); // public endpoint, no auth
+                const res = await fetch(endpoint);
                 if (!res.ok) throw new Error('Failed to fetch products');
                 const data: Product[] = await res.json();
-
-                //console.log(data[0].image_url);
 
                 // Ensure all fields have fallback values
                 const mapped: Product[] = data.map(p => ({
@@ -41,7 +39,8 @@ const LatestProductsWrapper: React.FC<LatestProductsWrapperProps> = ({
                     price: p.price ?? 0,
                     stars: p.stars ?? null,
                     stock_status: p.stock_status ?? false,
-                    image_url: p.image_url ?? null,
+                    image_url: p.image_url ?? '/placeholder.png',
+                    slug: p.slug ?? '',
                     warranty: p.warranty ?? 0,
                     delivery_days: p.delivery_days ?? 0,
                     return_days: p.return_days ?? 0,
@@ -56,10 +55,14 @@ const LatestProductsWrapper: React.FC<LatestProductsWrapperProps> = ({
         }
 
         fetchProducts();
-        return () => { isMounted = false; };
+
+        return () => {
+            isMounted = false;
+        };
     }, [endpoint]);
 
     if (loading) return <div className="text-center py-12"><LoadingFallback /></div>;
+    if (products.length === 0) return <p className="text-center py-12">No products available.</p>;
 
     if (children) {
         return <>{children({ products })}</>;
@@ -71,9 +74,7 @@ const LatestProductsWrapper: React.FC<LatestProductsWrapperProps> = ({
             products={products}
             showViewAll={showViewAll}
             onAddToCart={(product) => console.log('Add to cart:', product)}
-            onAddToWishlist={(product) => console.log('Add to wishlist:', product)}
             onCompare={(product) => console.log('Compare product:', product)}
-            onProductClick={(product) => console.log('View product:', product)}
             onViewAll={() => console.log('View all clicked')}
         />
     );

@@ -28,7 +28,7 @@ const defaultCategories: Category[] = [
         name: "Body Parts",
         productCount: 4,
         image: "/images/car-brake-disc.png",
-        link: "/category/body-parts",
+        link: "/",
         bgColor: "bg-white border border-accent-50",
     },
     {
@@ -36,7 +36,7 @@ const defaultCategories: Category[] = [
         name: "Exterior",
         productCount: 1,
         image: "/images/radiator-grill.png",
-        link: "/category/exterior",
+        link: "/",
         bgColor: "bg-white border border-accent-50",
     },
     {
@@ -44,7 +44,7 @@ const defaultCategories: Category[] = [
         name: "Interior",
         productCount: 7,
         image: "/images/interior.png",
-        link: "/category/interior",
+        link: "/",
         bgColor: "bg-white border border-accent-50",
     },
     {
@@ -52,7 +52,7 @@ const defaultCategories: Category[] = [
         name: "Parts",
         productCount: 15,
         image: "/images/parts.png",
-        link: "/category/parts",
+        link: "/",
         bgColor: "bg-white border border-accent-50",
     },
     {
@@ -60,15 +60,15 @@ const defaultCategories: Category[] = [
         name: "Performance",
         productCount: 7,
         image: "/images/performance.png",
-        link: "/category/performance",
+        link: "/",
         bgColor: "bg-white border border-accent-50",
     },
     {
         id: "maintenance",
         name: "Maintenance",
         productCount: 12,
-        image: "/images/radiator-grill.png",
-        link: "/category/maintenance",
+        image: "/images/maintenance.png",
+        link: "/",
         bgColor: "bg-white border border-accent-50",
     },
 ];

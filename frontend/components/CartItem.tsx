@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
 import { X, Heart } from 'lucide-react';
 import Image from "next/image";
+import { useWishlist } from '@/components/WishlistContext';
 
 interface CartItemProps {
     id: number;
     name: string;
     image: string;
     price: number;
+    category: string;
+    stock_status: boolean;
+    warranty: number;
+    delivery_days: number;
+    return_days: number;
     initialQuantity?: number;
     onRemove?: (id: string) => void;
-    onMoveToFavorites?: (id: string) => void;
     className?: string;
 }
 
@@ -18,19 +23,39 @@ const CartItem: React.FC<CartItemProps> = ({
                                                name,
                                                image,
                                                price,
+                                               category,
+                                               stock_status,
+                                               warranty,
+                                               delivery_days,
+                                               return_days,
                                                initialQuantity = 1,
                                                onRemove,
-                                               onMoveToFavorites,
                                                className = ''
                                            }) => {
     const [quantity] = useState(initialQuantity);
+    const { addToWishlist, removeFromWishlist, isWishlisted } = useWishlist();
+    const wishlisted = isWishlisted(id);
 
     const handleRemove = () => {
         onRemove?.(id.toString());
     };
 
-    const handleMoveToFavorites = () => {
-        onMoveToFavorites?.(id.toString());
+    const handleWishlist = () => {
+        if (wishlisted) {
+            removeFromWishlist(id);
+        } else {
+            addToWishlist({
+                id,
+                name,
+                image_url: image,
+                price,
+                category,
+                stock_status,
+                warranty,
+                delivery_days,
+                return_days
+            });
+        }
     };
 
     return (
@@ -49,7 +74,10 @@ const CartItem: React.FC<CartItemProps> = ({
             {/* Product Details */}
             <div className="flex-1 flex flex-col justify-between">
                 <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-sm font-semibold text-gray-900">{name}</h3>
+                    <div>
+                        <h3 className="text-sm font-semibold text-gray-900">{name}</h3>
+                        <div className="text-xs text-gray-500 mt-1">Qty: {quantity}</div>
+                    </div>
                     <button
                         onClick={handleRemove}
                         className="text-gray-400 hover:text-gray-600 p-1"
@@ -62,11 +90,11 @@ const CartItem: React.FC<CartItemProps> = ({
                 {/* Bottom Row: Move to Favorites & Price */}
                 <div className="flex justify-between items-center gap-4">
                     <button
-                        onClick={handleMoveToFavorites}
-                        className="flex items-center gap-1 text-xs text-gray-600 hover:text-gray-800"
+                        onClick={handleWishlist}
+                        className={`flex items-center gap-1 text-xs transition-colors ${wishlisted ? 'text-red-500' : 'text-gray-600 hover:text-gray-800'}`}
                     >
-                        <Heart className="w-3 h-3" />
-                        <span className="uppercase tracking-wide">Add to wishlist</span>
+                        <Heart className={`w-3 h-3 ${wishlisted ? 'fill-current text-red-500' : ''}`} />
+                        <span className="uppercase tracking-wide">{wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}</span>
                     </button>
                     <div className="text-lg font-semibold text-primary-100">
                         ${(price * quantity).toFixed(2)}

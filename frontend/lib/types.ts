@@ -9,17 +9,25 @@ export interface VehicleInfo {
     trim?: string;
 }
 
+export interface ProductImage {
+    id: number;
+    image_url: string;
+}
+
 export interface Product {
     id: number;
+    slug?: string; // for detail route
     name: string;
     category: string;
     price: number;
     stars?: number | null;
     stock_status: boolean;
-    image_url?: string | null;
+    image_url?: string | null; // keep this for listing
+    images?: ProductImage[];   // full gallery for detail
     warranty: number;
     delivery_days: number;
     return_days: number;
+    description?: string;
 }
 
 export interface Part {
@@ -37,25 +45,28 @@ export interface Part {
 // Normalized object for frontend table rendering
 export interface NormalizedPart {
     id: number;
-    make?: string;
-    model?: string;
-    year_start?: number;
-    year_end?: number;
-    trim?: string | null;
-    drive_type?: string | null;
-    body_class?: string | null;
-
-    // product info
     productId: number;
+    slug: string;
     name: string;
-    image_url?: string | null;
-    price: number;
-    stars?: number | null;
     category: string;
+    price: number;
+    stars: number | null;
     stock_status: boolean;
+    image_url: string;
     warranty: number;
     delivery_days: number;
     return_days: number;
+    description: string;
+    images: ProductImage[];
+
+    // flat part info
+    make: string;
+    model: string;
+    year_start: number;
+    year_end: number;
+    trim?: string;
+    drive_type?: string;
+    body_class?: string;
 }
 
 

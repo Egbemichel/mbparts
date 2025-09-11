@@ -1,7 +1,12 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import PartsAdmin, Part
+from .models import PartsAdmin, Part, ProductImage
+
+
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    extra = 1
 
 @admin.register(PartsAdmin)
 class PartsAdminAdmin(admin.ModelAdmin):
@@ -11,6 +16,8 @@ class PartsAdminAdmin(admin.ModelAdmin):
     ]
     list_filter = ["category", "stock_status"]
     search_fields = ["name"]
+    prepopulated_fields = {"slug": ("name",)}
+    inlines = [ProductImageInline]
 
 @admin.register(Part)
 class PartAdmin(admin.ModelAdmin):

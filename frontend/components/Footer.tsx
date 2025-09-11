@@ -1,6 +1,7 @@
 "use client";
 import React from 'react';
 import { ChevronUp } from 'lucide-react';
+import Image from "next/image";
 
 interface FooterLink {
     label: string;
@@ -9,9 +10,8 @@ interface FooterLink {
 
 const SimpleFooter: React.FC = () => {
     const footerLinks: FooterLink[] = [
-        { label: "Privacy Policy", href: "/privacy" },
-        { label: "Terms", href: "/terms" },
-        { label: "Sitemap", href: "/sitemap" }
+        { label: "Privacy Policy", href: "/" },
+        { label: "Terms", href: "/" },
     ];
 
     const currentYear = new Date().getFullYear();
@@ -29,7 +29,14 @@ const SimpleFooter: React.FC = () => {
                 <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
                     {/* Copyright */}
                     <div className="text-gray-500 text-sm order-2 md:order-1">
-                        Copyright © {currentYear} <span className="text-orange-500 font-medium">Karpart</span>. All rights reserved
+                        Copyright © {currentYear} <span className="text-orange-500 font-medium">
+                        <Image
+                            src={"/images/mbparts_logo.jpg"}
+                            alt={"mbparts logo"}
+                            width={40}
+                            height={40}
+                        />
+                    </span>. All rights reserved
                     </div>
 
                     {/* Go To Top Button */}

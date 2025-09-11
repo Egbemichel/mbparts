@@ -1,7 +1,7 @@
 # apps/parts/urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import PartViewSet, PartsAdminViewSet, FitmentView
+from .views import PartViewSet, PartsAdminViewSet, FitmentView, ProductDetailView
 from .auth_view import CookieLoginView, CookieRefreshView, MeView, LogoutView
 from django.conf import settings
 from django.conf.urls.static import static
@@ -19,6 +19,8 @@ urlpatterns = [
     path("auth/me/", MeView.as_view(), name="auth_me"),
 
     path('parts-public/', views.public_parts_admin_list, name='parts-public'),
+
+    path("parts/<slug:slug>/", ProductDetailView.as_view(), name="part-detail"),
 
 
     # VIN fitment

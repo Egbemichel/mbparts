@@ -48,7 +48,7 @@ const defaultMainOffer: MainOffer = {
     subtitle: '',
     description: 'on a set of select tires',
     ctaText: 'SHOP NOW',
-    ctaLink: '/offers/tires',
+    ctaLink: '/',
     image: '/images/car-brake-disc.png',
     backgroundColor: 'bg-orange-500'
 };
@@ -63,8 +63,8 @@ const defaultProducts: SpecialOfferProduct[] = [
         discount: '99% OFF',
         rating: 5,
         reviewCount: 5,
-        image: 'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?q=80&w=400&auto=format&fit=crop',
-        link: '/product/spark-plug-ity20'
+        image: '/images/spark-plug.jpg',
+        link: '/'
     },
     {
         id: 'steering-wheel',
@@ -75,8 +75,8 @@ const defaultProducts: SpecialOfferProduct[] = [
         discount: '55% OFF',
         rating: 4,
         reviewCount: 5,
-        image: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=400&auto=format&fit=crop',
-        link: '/product/steering-wheel-28'
+        image: '/images/steering-wheel.jpg',
+        link: '/'
     }
 ];
 
