@@ -1,6 +1,7 @@
 // app/layout.tsx
 import ServerLayout, { metadata } from "./server-layout";
 import ClientLayout from "./client-layout";
+import "./globals.css";
 
 export { metadata };
 
