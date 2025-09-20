@@ -161,6 +161,18 @@ export default function PartsAdminPage() {
         }
     }, [authenticated, loadParts, loadCategories]);
 
+    // Add body scroll lock effect
+    useEffect(() => {
+        if (modalOpen || categoryModalOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [modalOpen, categoryModalOpen]);
+
     // ---------- Helpers ----------
     const safeNumber = (v: unknown, fallback = 0) => {
         const n = Number(String(v ?? "").trim());
@@ -551,9 +563,16 @@ export default function PartsAdminPage() {
 
             {/* --- Modals --- */}
             {/* Edit Part Modal */}
-            <Modal ariaHideApp={false} isOpen={modalOpen} onRequestClose={closeEditModal} contentLabel="Edit Part" className="bg-white p-6 max-w-lg mx-auto mt-20 rounded shadow-lg z-50" overlayClassName="fixed inset-0 bg-black bg-opacity-50">
+            <Modal
+                ariaHideApp={false}
+                isOpen={modalOpen}
+                onRequestClose={closeEditModal}
+                contentLabel="Edit Part"
+                className="fixed inset-0 flex items-center justify-center z-50"
+                overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-40"
+            >
                 {editingPart && (
-                    <div className="grid gap-3">
+                    <div className="bg-white p-6 rounded shadow-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
                         <h2 className="text-xl font-bold mb-2">Edit Part</h2>
                         <input className="border p-2" value={editingPart.name} onChange={(e) => setEditingPart({ ...editingPart, name: e.target.value })} />
                         <div>
@@ -586,9 +605,16 @@ export default function PartsAdminPage() {
             </Modal>
 
             {/* Category Modal */}
-            <Modal ariaHideApp={false} isOpen={categoryModalOpen} onRequestClose={() => { setCategoryModalOpen(false); setEditingCategory(null); }} contentLabel="Edit Category" className="bg-white p-6 max-w-md mx-auto mt-20 rounded shadow-lg z-50" overlayClassName="fixed inset-0 bg-black bg-opacity-50">
+            <Modal
+                ariaHideApp={false}
+                isOpen={categoryModalOpen}
+                onRequestClose={() => { setCategoryModalOpen(false); setEditingCategory(null); }}
+                contentLabel="Edit Category"
+                className="fixed inset-0 flex items-center justify-center z-50"
+                overlayClassName="fixed inset-0 bg-black bg-opacity-50 z-40"
+            >
                 {editingCategory && (
-                    <div className="flex flex-col gap-2">
+                    <div className="bg-white p-6 rounded shadow-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
                         <h2 className="text-xl font-bold">{editingCategory.id ? 'Edit' : 'Add'} Category</h2>
                         <input type="text" placeholder="Category Name" className="border p-2 rounded" value={editingCategory.name} onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })} />
                         <select className="border p-2 rounded" value={editingCategory.parent ?? ''} onChange={(e) => setEditingCategory({ ...editingCategory, parent: Number(e.target.value) || null })}>
