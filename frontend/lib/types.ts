@@ -15,6 +15,8 @@ export interface ProductImage {
 }
 
 export interface Product {
+    category_slug: string;
+    category_name: string;
     id: number;
     slug?: string; // for detail route
     name: string;
@@ -48,14 +50,14 @@ export interface NormalizedPart {
     productId: number;
     slug: string;
     name: string;
-    category: string;
-    price: number;
-    stars: number | null;
+    new_category: number | null;
+    price: string;
+    stars: string | null;
     stock_status: boolean;
     image_url: string;
-    warranty: number;
-    delivery_days: number;
-    return_days: number;
+    warranty: string;
+    delivery_days: string;
+    return_days: string;
     description: string;
     images: ProductImage[];
 
@@ -79,3 +81,4 @@ export interface PaginatedParts {
 
 // The final fitment results keyed by category
 export type FitmentResults = Record<string, PaginatedParts>;
+

@@ -76,7 +76,7 @@ const FlexibleBanner: React.FC<FlexibleBannerProps> = ({
         return (
             <div
                 key={banner.id}
-                className={`relative group ${isFullWidth ? containerHeight : 'h-64 md:h-80'} overflow-hidden rounded-lg ${!isFullWidth ? 'flex-1' : ''}`}
+                className={`relative group ${isFullWidth ? containerHeight : 'h-64 md:h-80'} overflow-hidden ${!isFullWidth ? 'flex-1' : ''}`}
                 style={{ width: '100%', maxWidth: isFullWidth ? '100%' : undefined }}
             >
                 <div className="absolute inset-0 overflow-hidden">

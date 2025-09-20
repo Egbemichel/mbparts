@@ -50,6 +50,8 @@ const CartItem: React.FC<CartItemProps> = ({
                 image_url: image,
                 price,
                 category,
+                category_slug: category,
+                category_name: category,
                 stock_status,
                 warranty,
                 delivery_days,

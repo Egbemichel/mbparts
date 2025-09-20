@@ -30,8 +30,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                 minHeight: "100vh",
                 width: "100%",
                 boxSizing: "border-box",
-                paddingLeft: "2rem",
-                paddingRight: "2rem",
+                paddingLeft: "0rem",
+                paddingRight: "0rem",
                 maxWidth: "100vw",
             }}
         >

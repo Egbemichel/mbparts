@@ -1,5 +1,5 @@
-'use client'
-import React, { useState, useCallback } from 'react';
+'use client';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from "next/navigation";
 import SearchIcon from "@/public/icons/SearchIcon";
@@ -19,14 +19,23 @@ interface HeaderProps {
     userEmail?: string;
 }
 
+interface Category {
+    id: number;
+    name: string;
+    slug: string;
+    parent: number | null;
+    // Add other properties if needed
+}
+
 const Header: React.FC<HeaderProps> = ({
                                            isLoggedIn = false,
                                            userEmail = ""
                                        }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showVehicleDropdown, setShowVehicleDropdown] = useState(false);
-    const router = useRouter(); // 👈 initialize
+    const router = useRouter();
     const [vinInput, setVinInput] = useState("");
+    const [categories, setCategories] = useState<Category[]>([]);
 
     const [vehicle, setVehicle] = useState({
         year: "",
@@ -38,21 +47,45 @@ const Header: React.FC<HeaderProps> = ({
     const { wishlist } = useWishlist();
     const wishlistCount = wishlist.length;
 
+    // ✅ Fetch categories from backend
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/parts/categories/`);
+                if (!res.ok) throw new Error("Failed to load categories");
+                const data = await res.json();
+                setCategories(data.results || []); // ✅ only array
+            } catch (err) {
+                console.error("Error fetching categories:", err);
+            }
+        };
+        fetchCategories();
+    }, []);
+
+    // ✅ Filter parts and accessories from backend
+    const partsCategories = categories
+        .filter(cat => cat.parent === null && cat.slug === "parts")
+        .flatMap(partsParent =>
+            categories.filter(sub => sub.parent === partsParent.id)
+        );
+
+    const accessoriesCategories = categories
+        .filter(cat => cat.parent === null && cat.slug === "accessories")
+        .flatMap(accParent =>
+            categories.filter(sub => sub.parent === accParent.id)
+        );
+
     const handleVehicleChange = useCallback((key: string, value: string) => {
         setVehicle((prev) => ({ ...prev, [key]: value }));
     }, []);
 
     const handleVehicleSearch = useCallback(() => {
-        if (!vehicle.year || !vehicle.make || !vehicle.model) {
-            // You can set an error state here or show a message
-            return;
-        }
-        // Implement search logic here, e.g., call an API or update state
+        if (!vehicle.year || !vehicle.make || !vehicle.model) return;
+        // Implement search logic here
     }, [vehicle]);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        // Handle search logic here
         console.log('Searching for:', searchQuery);
     };
 
@@ -61,19 +94,16 @@ const Header: React.FC<HeaderProps> = ({
             alert("Please enter a valid VIN (at least 17 characters).");
             return;
         }
-        // Navigate to the dynamic VIN decoder page
         router.push(`/vin/${vinInput}`);
-        // Close dropdown (if applicable)
         setShowVehicleDropdown(false);
     };
 
-
     const AddVehicleDropdown = ({
-        show,
-        vehicle,
-        handleVehicleChange,
-        handleVehicleSearch
-    }: {
+                                    show,
+                                    vehicle,
+                                    handleVehicleChange,
+                                    handleVehicleSearch
+                                }: {
         show: boolean,
         vehicle: { year: string, make: string, model: string },
         handleVehicleChange: (key: string, value: string) => void,
@@ -81,7 +111,7 @@ const Header: React.FC<HeaderProps> = ({
     }) => (
         show ? (
             <div
-                className="absolute left-0 right-0 top-full mt-2 w-full min-w-[16rem] bg-white rounded-md shadow-lg border border-gray-200 z-[9999]"
+                className="absolute left-0 right-0 top-full mt-2 w-full min-w-[16rem] bg-white border-gray-200 z-[9999] shadow-lg"
             >
                 <div className="p-4 space-y-3">
                     {/* VIN Input */}
@@ -94,10 +124,9 @@ const Header: React.FC<HeaderProps> = ({
                                 maxLength={17}
                                 placeholder="e.g. 1HGCM82633A004352"
                                 className="flex-1 p-2 border border-gray-300 rounded-md text-sm"
-                                value={vinInput}                          // 👈 bind state
-                                onChange={(e) => setVinInput(e.target.value)} // 👈 update state
+                                value={vinInput}
+                                onChange={(e) => setVinInput(e.target.value)}
                             />
-
                             <button
                                 type="button"
                                 onClick={handleDecodeVIN}
@@ -120,7 +149,6 @@ const Header: React.FC<HeaderProps> = ({
                         onChange={(e) => handleVehicleChange("year", e.target.value)}
                     >
                         <option>Select Year</option>
-                        {/* TODO: populate dynamically from CarQuery API */}
                     </select>
 
                     <select
@@ -151,11 +179,148 @@ const Header: React.FC<HeaderProps> = ({
         ) : null
     );
 
+    const HamburgerIcon = ({ className = "w-7 h-7" }) => (
+        <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    );
+
+    // ✅ Build sidebarNavItems dynamically from backend
+    const sidebarNavItems = [
+        { label: 'Home', href: '/' },
+        { label: 'Shop', href: '/shop' },
+        {
+            label: 'Parts',
+            href: '/parts',
+            children: partsCategories.map(cat => ({
+                label: cat.name,
+                href: `/parts/${cat.slug}`
+            }))
+        },
+        {
+            label: 'Accessories',
+            href: '/accessories',
+            children: accessoriesCategories.map(cat => ({
+                label: cat.name,
+                href: `/accessories/${cat.slug}`
+            }))
+        },
+        { label: 'Contact', href: '/contact' },
+        { label: 'Blog', href: '/blog' },
+        { label: 'About Us', href: '/about' },
+        { label: 'FAQ', href: '/faqs' },
+        { label: 'Privacy Policy', href: '/' },
+        { label: 'Terms', href: '/' },
+    ];
+
+    const SidebarNav = ({ open, onClose }: { open: boolean, onClose: () => void }) => {
+        const [expanded, setExpanded] = useState<string | null>(null);
+        const sidebarRef = useRef<HTMLDivElement>(null);
+
+        useEffect(() => {
+            if (!open) return;
+            const handleClick = (e: MouseEvent) => {
+                if (sidebarRef.current && !sidebarRef.current.contains(e.target as Node)) onClose();
+            };
+            document.addEventListener('mousedown', handleClick);
+            return () => document.removeEventListener('mousedown', handleClick);
+        }, [open, onClose]);
+
+        useEffect(() => {
+            document.body.classList.toggle('overflow-hidden', open);
+            return () => document.body.classList.remove('overflow-hidden');
+        }, [open]);
+
+        return (
+            <div className={`fixed inset-0 z-[9999] pointer-events-none`} aria-modal="true" role="dialog">
+                <div
+                    className={`fixed inset-0 bg-black/40 transition-opacity duration-300 ease-in-out ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0'}`}
+                    onClick={onClose}
+                />
+                <div
+                    ref={sidebarRef}
+                    className={`fixed top-0 left-0 h-full w-80 bg-white shadow-xl z-[10000] transform transition-transform duration-300 ease-in-out will-change-transform ${open ? 'translate-x-0 pointer-events-auto' : '-translate-x-full'}`}
+                    tabIndex={-1}
+                    aria-label="Sidebar navigation"
+                >
+                    <div className="flex items-center justify-between px-6 py-4 border-b">
+                        <span className="font-bold text-lg text-primary-50">Menu</span>
+                        <button
+                            onClick={onClose}
+                            aria-label="Close sidebar"
+                            className="text-gray-700 p-2"
+                        >
+                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <nav className="flex flex-col gap-1 px-4 py-4 overflow-y-auto max-h-full">
+                        {sidebarNavItems.map(item => (
+                            <div key={item.label}>
+                                {/* ✅ If no children → normal link */}
+                                {!item.children ? (
+                                    <Link
+                                        href={item.href}
+                                        className="block py-2 px-2 rounded text-gray-900 font-medium hover:bg-primary-50 hover:text-white transition-colors"
+                                        onClick={onClose}
+                                    >
+                                        {item.label}
+                                    </Link>
+                                ) : (
+                                    <>
+                                        {/* ✅ If children → button, not link */}
+                                        <button
+                                            type="button"
+                                            onClick={() => setExpanded(expanded === item.label ? null : item.label)}
+                                            className="w-full flex justify-between items-center py-2 px-2 rounded text-gray-900 font-medium hover:bg-primary-50 hover:text-white transition-colors"
+                                        >
+                                            {item.label}
+                                            <ArrowDownIcon
+                                                className={`w-4 h-4 transition-transform duration-200 ${expanded === item.label ? "rotate-180" : ""}`}
+                                            />
+                                        </button>
+                                        {expanded === item.label && (
+                                            <div className="pl-6 transition-all duration-300 ease-in-out">
+                                                {item.children.map(child => (
+                                                    <Link
+                                                        key={child.href}
+                                                        href={child.href}
+                                                        className="block py-2 px-2 rounded text-gray-700 hover:bg-primary-30 hover:text-white transition-colors"
+                                                        onClick={onClose}
+                                                    >
+                                                        {child.label}
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                        ))}
+                    </nav>
+                </div>
+            </div>
+        );
+    };
+
+
     return (
         <>
-            <header className="bg-white border-gray-200 w-full">
-                <div className="w-full max-w-full px-2 sm:px-4 md:px-8 lg:px-16 xl:px-32 mx-auto">
-                    <div className="flex items-center justify-between h-16 w-full">
+            <header className="bg-white border-gray-200">
+                <div className="w-full max-w-full px-4 sm:px-4 md:px-8 lg:px-6 mx-auto">
+                    <div className="flex items-center justify-between h-16 w-full gap-2">
+                        {/* Mobile Menu Button */}
+                        <div className="block sm:hidden px-2">
+                            <button
+                                onClick={() => setShowVehicleDropdown(true)}
+                                className="text-gray-700 hover:text-primary-100 transition-colors"
+                                aria-label="Open menu"
+                            >
+                                <HamburgerIcon />
+                            </button>
+                        </div>
                         {/* Logo */}
                         <div className="flex-shrink-0">
                             <Link href="/" className="flex items-center">
@@ -171,10 +336,10 @@ const Header: React.FC<HeaderProps> = ({
                         </div>
 
                         <div
-                            className="p-0.5 border border-accent-50 rounded-sm ml-10 mr-10 flex items-center justify-between w-full max-w-2xl"
+                            className="p-0.5 border-accent-50 rounded-sm ml-10 mr-10 flex items-center justify-between w-full max-w-2xl"
                             style={{ maxWidth: '100%' }}
                         >
-                            {/* Add Vehicle Button (Visible on all screens) */}
+                            {/* Add Vehicle Button */}
                             <div className="block w-full max-w-xs">
                                 <div className="relative w-full hidden md:block">
                                     <button
@@ -195,13 +360,11 @@ const Header: React.FC<HeaderProps> = ({
                                     />
                                 </div>
 
-                                {/* Mobile-only: User, Wishlist & Cart icons row below Add Vehicle button */}
-                                <div className="flex justify-center gap-6 mt-2 sm:hidden">
-                                    {/* User Icon (mobile) */}
+                                {/* Mobile-only Icons */}
+                                <div className="flex justify-center gap-8 mt-2 sm:hidden">
                                     {isLoggedIn ? (
                                         <div className="flex items-center text-gray-700">
                                             <UserIcon/>
-                                            {/* Optionally show email or 'Account' on mobile, or just icon */}
                                         </div>
                                     ) : (
                                         <Link
@@ -213,7 +376,6 @@ const Header: React.FC<HeaderProps> = ({
                                         </Link>
                                     )}
 
-                                    {/* Wishlist Icon (mobile) */}
                                     <Link
                                         href="/wishlist"
                                         className="relative p-2 text-gray-700 hover:text-primary-100 transition-colors"
@@ -229,7 +391,6 @@ const Header: React.FC<HeaderProps> = ({
                                         <span className="sr-only">{wishlistCount} items in wishlist</span>
                                     </Link>
 
-                                    {/* Cart Icon (mobile) */}
                                     <Link
                                         href="/cart"
                                         className="relative p-2 text-gray-700 hover:text-primary-50 transition-colors"
@@ -242,7 +403,7 @@ const Header: React.FC<HeaderProps> = ({
                                                 {cartCount > 99 ? '99+' : cartCount}
                                             </span>
                                         )}
-                                        <span className="sr-only text-black">{cartCount} items in cart</span>
+                                        <span className="sr-only">{cartCount} items in cart</span>
                                     </Link>
                                 </div>
                             </div>
@@ -270,7 +431,6 @@ const Header: React.FC<HeaderProps> = ({
 
                         {/* User Actions */}
                         <div className="flex items-center space-x-4">
-                            {/* Login/Register or User Menu (Desktop) */}
                             <div className="hidden sm:block">
                                 {isLoggedIn ? (
                                     <div className="flex items-center text-gray-700">
@@ -288,8 +448,6 @@ const Header: React.FC<HeaderProps> = ({
                                 )}
                             </div>
 
-
-                            {/* Wishlist */}
                             <div className="hidden sm:flex items-center space-x-4">
                                 <Link
                                     href="/wishlist"
@@ -300,13 +458,12 @@ const Header: React.FC<HeaderProps> = ({
                                     {wishlistCount > 0 && (
                                         <span
                                             className="absolute -top-1 -right-1 bg-primary-50 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
-                                        {wishlistCount > 99 ? '99+' : wishlistCount}
-                                    </span>
+                                            {wishlistCount > 99 ? '99+' : wishlistCount}
+                                        </span>
                                     )}
                                     <span className="sr-only">{wishlistCount} items in wishlist</span>
                                 </Link>
 
-                                {/* Cart */}
                                 <Link
                                     href="/cart"
                                     className="relative p-2 text-gray-700 hover:text-primary-50 transition-colors"
@@ -336,6 +493,9 @@ const Header: React.FC<HeaderProps> = ({
 
                 <SecondaryNav/>
             </header>
+
+            {/* Mobile Sidebar Navigation */}
+            <SidebarNav open={showVehicleDropdown} onClose={() => setShowVehicleDropdown(false)} />
         </>
     );
 };

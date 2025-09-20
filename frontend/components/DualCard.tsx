@@ -27,7 +27,7 @@ export const DualCardsBanner: React.FC = () => {
     ];
 
     return (
-        <div className="w-full max-w-full px-2 sm:px-4 md:px-8 lg:px-16 xl:px-32 mx-auto">
+        <div className="hidden md:block w-full max-w-full px-2 sm:px-4 md:px-8 lg:px-0 mx-auto">
             <FlexibleBanner
                 layout="dual-cards"
                 banners={dualBanners}

@@ -46,8 +46,8 @@ export default function ProductDetailsClient({ product }: { product: Product }) 
     return (
         <div className="bg-gray-50">
             <NavbarHome/>
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="grid lg:grid-cols-2 gap-8 mb-12">
+            <div className="max-w-7xl mx-auto px-2 sm:px-4 py-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                     {/* Product Images */}
                     <div className="space-y-4">
                         <div className="relative aspect-square bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -55,7 +55,7 @@ export default function ProductDetailsClient({ product }: { product: Product }) 
                                 src={product.images?.[selectedImageIndex]?.image_url || product.image_url || "/placeholder.png"}
                                 alt={product.name}
                                 fill
-                                className="object-contain p-8"
+                                className="object-contain p-4 sm:p-8"
                                 priority
                             />
                         </div>
@@ -65,7 +65,7 @@ export default function ProductDetailsClient({ product }: { product: Product }) 
                                 {product.images.map((img: ProductImage, index: number) => (
                                     <div
                                         key={img.id}
-                                        className={`flex-shrink-0 w-20 h-20 border rounded-lg overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-105 ${
+                                        className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 border rounded-lg overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-105 ${
                                             index === selectedImageIndex ? "border-orange-500" : "border-gray-200"
                                         }`}
                                         onClick={() => setSelectedImageIndex(index)}
@@ -82,12 +82,11 @@ export default function ProductDetailsClient({ product }: { product: Product }) 
                             </div>
                         )}
                     </div>
-
                     {/* Product Info */}
                     <div className="space-y-6">
-                        <h1 className="text-5xl font-bold text-gray-900">{product.name}</h1>
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 break-words">{product.name}</h1>
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-3">
                             <div className="flex items-center gap-1">{renderStars(product.stars || 0)}</div>
                             {product.stock_status ? (
                                 <span className="flex items-center text-green-600 text-sm font-medium ml-3">
@@ -103,14 +102,14 @@ export default function ProductDetailsClient({ product }: { product: Product }) 
                         {/* Price & Description */}
                         <div className="border-t border-b border-gray-200 py-4">
                             <div className="flex items-center gap-3 mb-2">
-                                <span className="text-3xl font-bold text-primary-100">${product.price}</span>
+                                <span className="text-2xl sm:text-3xl font-bold text-primary-100">${product.price}</span>
                             </div>
-                            <p className="text-sm text-gray-700 mt-2 leading-relaxed">{product.description}</p>
+                            <p className="text-sm text-gray-700 mt-2 leading-relaxed break-words">{product.description}</p>
                         </div>
 
                         {/* Quantity & Add to Cart */}
-                        <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-                            <div className="flex items-center border border-gray-300 w-full sm:w-auto">
+                        <div className="flex flex-row gap-3 items-center w-full">
+                            <div className="flex items-center border border-gray-300 w-auto">
                                 <button onClick={() => handleQuantityChange(-1)} disabled={quantity <= 1}
                                         className="p-2 hover:bg-gray-100">-
                                 </button>
@@ -120,7 +119,7 @@ export default function ProductDetailsClient({ product }: { product: Product }) 
                             <button
                                 onClick={handleAddToCart}
                                 disabled={!product.stock_status}
-                                className="flex-1 sm:w-auto bg-orange-500 text-white px-6 py-3 font-medium hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all duration-200"
+                                className="flex-1 bg-orange-500 text-white px-4 sm:px-6 py-3 font-medium hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all duration-200"
                             >
                                 <ShoppingCart className="w-5 h-5"/> Add to Cart
                             </button>
@@ -129,7 +128,7 @@ export default function ProductDetailsClient({ product }: { product: Product }) 
                         {/* Wishlist */}
                         <button
                             onClick={handleWishlist}
-                            className={`w-full sm:w-auto px-4 py-3 rounded-lg border-2 transition-colors mt-3 ${
+                            className={`w-[60px] sm:w-auto px-4 py-3 border-2 transition-colors mt-3 ${
                                 wishlisted ? "border-red-500 text-red-500 bg-red-50" : "border-gray-300 text-gray-700 hover:border-gray-400"
                             }`}
                         >
@@ -158,7 +157,7 @@ export default function ProductDetailsClient({ product }: { product: Product }) 
                         </div>
 
                         {/* Social Icons */}
-                        <div className="flex items-center gap-3 mb-4">
+                        <div className="flex flex-wrap items-center gap-3 mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <path fillRule="evenodd" clipRule="evenodd"
                                       d="M6.18182 10.3333C5.20406 10.3333 5 10.5252 5 11.4444V13.1111C5 14.0304 5.20406 14.2222 6.18182 14.2222H8.54545V20.8889C8.54545 21.8081 8.74951 22 9.72727 22H12.0909C13.0687 22 13.2727 21.8081 13.2727 20.8889V14.2222H15.9267C16.6683 14.2222 16.8594 14.0867 17.0631 13.4164L17.5696 11.7497C17.9185 10.6014 17.7035 10.3333 16.4332 10.3333H13.2727V7.55556C13.2727 6.94191 13.8018 6.44444 14.4545 6.44444H17.8182C18.7959 6.44444 19 6.25259 19 5.33333V3.11111C19 2.19185 18.7959 2 17.8182 2H14.4545C11.191 2 8.54545 4.48731 8.54545 7.55556V10.3333H6.18182Z"
@@ -177,16 +176,15 @@ export default function ProductDetailsClient({ product }: { product: Product }) 
                         </div>
                     </div>
                 </div>
-
                 {/* Tabs */}
                 <div className="bg-white rounded-lg border border-gray-200">
                     <div className="border-b border-gray-200">
-                        <nav className="flex">
-                            {["Reviews"].map(tab => (
+                        <nav className="flex flex-wrap">
+                            {['Reviews'].map(tab => (
                                 <button
                                     key={tab}
                                     onClick={() => setSelectedTab(tab)}
-                                    className={`px-6 py-4 text-sm font-medium capitalize border-b-2 ${
+                                    className={`px-4 sm:px-6 py-4 text-sm font-medium capitalize border-b-2 ${
                                         selectedTab === tab ? "border-orange-500 text-orange-600" : "border-transparent text-gray-500 hover:text-gray-700"
                                     }`}
                                 >
@@ -195,8 +193,7 @@ export default function ProductDetailsClient({ product }: { product: Product }) 
                             ))}
                         </nav>
                     </div>
-                    <div className="p-6">
-
+                    <div className="p-4 sm:p-6">
                         {selectedTab === "Reviews" && (
                             <div>
                                 <div className="flex items-center justify-between mb-6">
@@ -240,8 +237,7 @@ export default function ProductDetailsClient({ product }: { product: Product }) 
 
                 {/* Related Products */}
                 <div className="mt-16">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Related products</h2>
-                    {/* Placeholder grid */}
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">Related products</h2>
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                         {/* Map related products here */}
                     </div>

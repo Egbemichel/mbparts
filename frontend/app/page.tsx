@@ -4,15 +4,16 @@ import {HeroBanner} from "@/components/HeroBanner";
 import {DualCardsBanner} from "@/components/DualCard";
 import CarPartCarrousel from "@/components/CarPartCarrousel";
 import LatestProductWrapper from "@/components/LatestProductWrapper";
-import PopularMakes from "@/components/PopularMakes";
-import SpecialOffer from "@/components/SpecialOffer";
-import TopPicks from "@/components/TopPicks";
-import SimpleBanner from "@/components/SimpleBanner";
-import MissionBanner from "@/components/MissionBanner";
-import BrandSection from "@/components/BrandsSection";
-import ArticleSection from "@/components/ArticleSection";
-import Services from "@/components/Services";
+//import PopularMakes from "@/components/PopularMakes";
+//import SpecialOffer from "@/components/SpecialOffer";
+//import TopPicks from "@/components/TopPicks";
+//import SimpleBanner from "@/components/SimpleBanner";
+//import MissionBanner from "@/components/MissionBanner";
+//import BrandSection from "@/components/BrandsSection";
+//import ArticleSection from "@/components/ArticleSection";
+//import Services from "@/components/Services";
 import PaymentCarousel from "@/components/PaymentCarrousel";
+import PopularAccessories from "@/components/PopularAccessories";
 
 
 
@@ -23,8 +24,10 @@ export default function Home() {
       <HeroBanner />
       <DualCardsBanner />
       <CarPartCarrousel />
+      <PopularAccessories />
       <LatestProductWrapper />
-      <PopularMakes />
+        {/*
+        <PopularMakes />
       <SpecialOffer />
       <TopPicks />
       <SimpleBanner />
@@ -32,6 +35,7 @@ export default function Home() {
       <BrandSection />
       <ArticleSection />
       <Services />
+        */}
       <PaymentCarousel />
     </div>
   );

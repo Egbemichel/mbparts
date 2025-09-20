@@ -10,8 +10,12 @@ interface FooterLink {
 
 const SimpleFooter: React.FC = () => {
     const footerLinks: FooterLink[] = [
+        { label: "About Us", href: "/about" },
+        { label: "FAQ", href: "/faqs" },
         { label: "Privacy Policy", href: "/" },
         { label: "Terms", href: "/" },
+        { label: "Contact", href: "/contact" },
+        { label: "Blog", href: "/blog" }
     ];
 
     const currentYear = new Date().getFullYear();
