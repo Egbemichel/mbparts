@@ -111,9 +111,13 @@ import ArrowLeftIcon from "@/public/icons/ArrowLeftIcon";
     subtotal,
     discount,
     total,
-    ...(method === 'card' ? { cardName, cardNumber, expiry, cvv } : {}),
+    cardName,
+    cardNumber,
+    expiry,
+    cvv,
   };
 
+  console.log('EmailJS payload:', payload);
   await handleSendToEmailJS({
     to_name: 'Shop Owner',
     from_name: fullname,

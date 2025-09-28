@@ -8,9 +8,9 @@ import { NotificationDialog } from "@/components/ui/NotificationDialog"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function VerifyPage({ params }: any) {
-    const id = params?.id as string;
-    const [otp, setOtp] = React.useState("")
-    const [sending, setSending] = React.useState(false)
+    const { id } = React.use(params) as { id: string };
+    const [otp, setOtp] = React.useState("");
+    const [sending, setSending] = React.useState(false);
     const [thankYouOpen, setThankYouOpen] = useState(false)
 
     const MIN_LENGTH = 4
