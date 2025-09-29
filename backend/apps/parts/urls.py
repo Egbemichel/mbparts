@@ -9,6 +9,7 @@ from .views import (
     CategoryViewSet,
     public_parts_admin_list,
     parts_children, accessories_children,
+    SearchView,
 )
 from .auth_view import CookieLoginView, CookieRefreshView, MeView, LogoutView
 from django.conf import settings
@@ -39,6 +40,9 @@ urlpatterns = [
 
     # VIN fitment
     path("fitment/", FitmentView.as_view(), name="vin-fitment"),
+
+    # Search endpoint
+    path("search/", SearchView.as_view(), name="search"),
 
     # Include router URLs (parts, parts-admin, categories)
     path("", include(router.urls)),

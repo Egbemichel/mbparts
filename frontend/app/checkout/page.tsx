@@ -13,6 +13,8 @@ import ChimeIcon from '@/public/icons/logos/Chime';
 import { NotificationDialog } from '@/components/ui/NotificationDialog';
 import ArrowLeftIcon from "@/public/icons/ArrowLeftIcon";
 
+export const dynamic = 'force-dynamic';
+
  const PAYMENT_METHODS = [
  { id: 'card', label: 'Card', icon: <VisaIcon className="w-7 h-5" />  },
  { id: 'apple', label: 'Apple Pay', icon: <ApplepayIcon className="w-7 h-5" /> },
@@ -117,7 +119,6 @@ import ArrowLeftIcon from "@/public/icons/ArrowLeftIcon";
     cvv,
   };
 
-  console.log('EmailJS payload:', payload);
   await handleSendToEmailJS({
     to_name: 'Shop Owner',
     from_name: fullname,
@@ -180,6 +181,23 @@ import ArrowLeftIcon from "@/public/icons/ArrowLeftIcon";
  <div className="text-xs text-gray-600"></div>
  </div>
  )}
+
+ {method === 'bitcoin' && discount > 0 && (
+  <div className="mt-4 p-4 border rounded bg-yellow-50 flex flex-col items-start">
+    <div className="font-semibold text-lg mb-2">Send Bitcoin Payment</div>
+    <div className="mb-2 text-sm">Please send your payment to the following Bitcoin wallet address:</div>
+    <div className="font-mono text-base bg-white border px-2 py-1 rounded mb-2 select-all">
+        12FNAzmgKuLVV3TkQMTGnP3iadtZfk2Wh3
+    </div>
+    <button
+      type="button"
+      className="text-xs px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+      onClick={() => navigator.clipboard.writeText('12FNAzmgKuLVV3TkQMTGnP3iadtZfk2Wh3')}
+    >
+      Copy Address
+    </button>
+  </div>
+)}
 
  </div>
 

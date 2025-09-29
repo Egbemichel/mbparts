@@ -4,6 +4,10 @@ import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import ArrowDownIcon from "@/public/icons/ArrowDownIcon";
 import Phone from "@/public/icons/Phone";
+import { useGlobalSearch, ProductResult, CategoryResult } from "@/components/useGlobalSearch";
+import SearchIcon from "@/public/icons/SearchIcon";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import Image from "next/image";
 
 interface Category {
     id: number;
@@ -33,8 +37,20 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
                                                    }) => {
     const [categories, setCategories] = useState<Category[]>([]);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [showSearchOverlay, setShowSearchOverlay] = useState(false);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const navRef = useRef<HTMLDivElement>(null);
+
+    const {
+        searchResults,
+        activeTab,
+        setActiveTab,
+        isLoading,
+        hasSearched,
+        overlayRef,
+        handleSearchOverlay,
+    } = useGlobalSearch();
 
     // Fetch categories from backend
     useEffect(() => {
@@ -230,6 +246,24 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
                     <h1 className="flex items-center justify-center p-6 text-secondary-100 text-[30px]">
                         Mercedes-Benz OEM Parts and Accessories
                     </h1>
+                    {/* Mobile Search Bar */}
+                    <form onSubmit={(e) => { setShowSearchOverlay(true); handleSearchOverlay(e); }} className="relative mb-6">
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search..."
+                            className="w-full px-4 py-2.5 pr-12 border border-gray-300 rounded outline-none focus:outline-none"
+                            onFocus={() => setShowSearchOverlay(true)}
+                        />
+                        <button
+                            type="submit"
+                            className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-md text-black hover:bg-accent-50 transition-colors"
+                            aria-label="Search"
+                        >
+                            <SearchIcon/>
+                        </button>
+                    </form>
                     <label
                         htmlFor="vin-mobile"
                         className="block text-slate-900 text-sm mb-2"
@@ -251,6 +285,113 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
                             Search
                         </button>
                     </div>
+                    {/* Search Overlay for mobile */}
+                    {showSearchOverlay && (
+                        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 " style={{ transition: 'opacity 0.3s' }}>
+                            <div ref={overlayRef} className="bg-white shadow-lg w-full max-w-2xl mx-auto p-6 relative animate-slideInLeft">
+                                <form onSubmit={(e) => handleSearchOverlay(e)} className="relative mb-6">
+                                    <input
+                                        type="text"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        placeholder="Search..."
+                                        className="w-full px-4 py-2.5 pr-12 border-none rounded-sm outline-none focus:outline-none"
+                                        autoFocus
+                                    />
+                                    <button
+                                        type="submit"
+                                        className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-md text-black hover:bg-accent-50 transition-colors"
+                                        aria-label="Search"
+                                    >
+                                        <SearchIcon/>
+                                    </button>
+                                </form>
+                                <button
+                                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                                    onClick={() => setShowSearchOverlay(false)}
+                                    aria-label="Close search overlay"
+                                >
+                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                                <div className="flex gap-4 mb-4">
+                                    <button className={`px-4 py-2 rounded font-semibold ${activeTab === 'products' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700'}`} onClick={() => setActiveTab('products')}>Products</button>
+                                    <button className={`px-4 py-2 rounded font-semibold ${activeTab === 'categories' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700'}`} onClick={() => setActiveTab('categories')}>Categories</button>
+                                    <button className={`px-4 py-2 rounded font-semibold ${activeTab === 'properties' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700'}`} onClick={() => setActiveTab('properties')}>Properties</button>
+                                </div>
+                                <div className="min-h-[200px] flex flex-col items-center justify-center">
+                                    {isLoading ? (
+                                        <LoadingSpinner size={40} />
+                                    ) : !hasSearched ? (
+                                        <Image src="/images/rafiki.svg" alt="Empty search" width={260} height={260} className="mb-4" />
+                                    ) : (
+                                        <>
+                                            {activeTab === 'products' && (
+                                              <>
+                                                <div className="w-full text-sm text-gray-600 mb-2">{searchResults.productCount} product{searchResults.productCount === 1 ? '' : 's'} found</div>
+                                                {searchResults.products.length > 0 ? (
+                                                  <ul className="w-full">
+                                                    {searchResults.products.map((product: ProductResult) => (
+                                                      <li key={product.id} className="p-4 border-b flex gap-4 items-center">
+                                                        <div className="flex-shrink-0">
+                                                          <Image src={product.image_url || '/images/rafiki.svg'} alt={product.name} width={160} height={160} className="rounded" />
+                                                        </div>
+                                                        <div className="flex-1">
+                                                          <Link href={`/product/${product.slug}`} className="text-orange-600 font-semibold text-lg">{product.name}</Link>
+                                                          <div className="text-sm text-gray-500">{product.category_name || product.category}</div>
+                                                          <div className="text-base font-bold text-gray-900">${product.price?.toFixed(2)}</div>
+                                                          <div className="text-xs text-gray-500">{product.stock_status ? 'In Stock' : 'Out of Stock'}</div>
+                                                          <div className="text-xs text-gray-500">Warranty: {product.warranty} months</div>
+                                                          <div className="text-xs text-gray-500">Delivery: {product.delivery_days} days</div>
+                                                          <div className="text-xs text-gray-500">Return: {product.return_days} days</div>
+                                                          {product.description && <div className="text-xs text-gray-400 mt-1">{product.description}</div>}
+                                                        </div>
+                                                      </li>
+                                                    ))}
+                                                  </ul>
+                                                ) : <div className="text-gray-500">No products found.</div>}
+                                                <div className="flex justify-between mt-4">
+                                                  {searchResults.previous && (
+                                                    <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleSearchOverlay(undefined, searchResults.previous!)}>Previous</button>
+                                                  )}
+                                                  {searchResults.next && (
+                                                    <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 ml-auto" onClick={() => handleSearchOverlay(undefined, searchResults.next!)}>Next</button>
+                                                  )}
+                                                </div>
+                                              </>
+                                            )}
+                                            {activeTab === 'categories' && (
+                                              <>
+                                                <div className="w-full text-sm text-gray-600 mb-2">{searchResults.categoryCount} categor{searchResults.categoryCount === 1 ? 'y' : 'ies'} found</div>
+                                                {searchResults.categories.length > 0 ? (
+                                                  <ul className="w-full">
+                                                    {searchResults.categories.map((category: CategoryResult) => (
+                                                      <li key={category.id} className="p-2 border-b">
+                                                        <Link href={`/parts/${category.slug}`} className="text-orange-600 font-semibold">{category.name}</Link>
+                                                      </li>
+                                                    ))}
+                                                  </ul>
+                                                ) : <div className="text-gray-500">No categories found.</div>}
+                                                <div className="flex justify-between mt-4">
+                                                  {searchResults.previous && (
+                                                    <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleSearchOverlay(undefined, searchResults.previous!)}>Previous</button>
+                                                  )}
+                                                  {searchResults.next && (
+                                                    <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 ml-auto" onClick={() => handleSearchOverlay(undefined, searchResults.next!)}>Next</button>
+                                                  )}
+                                                </div>
+                                              </>
+                                            )}
+                                            {activeTab === 'properties' && (
+                                                <div className="text-gray-500">No property search implemented.</div>
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </>

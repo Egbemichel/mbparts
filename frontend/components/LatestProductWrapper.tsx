@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import LatestProductsOriginal from './LatestProducts';
 import { Product } from '@/lib/types';
-import LoadingFallback from "@/components/ui/LoadingFallback";
 
 interface LatestProductsWrapperProps {
     title?: string;
@@ -101,7 +100,7 @@ const LatestProductsWrapper: React.FC<LatestProductsWrapperProps> = ({
         setPage(newPage);
     };
 
-    if (loading && initialLoad) return <div className="text-center py-12"><LoadingFallback /></div>;
+    if (loading && initialLoad) return null;
     if (products.length === 0) return <p className="text-center py-12">No products available.</p>;
 
     if (children) {

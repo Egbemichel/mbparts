@@ -13,6 +13,9 @@ import DoubleArrowRight from "@/public/icons/DoubleArrowRight";
 import { useCart } from '@/components/CartContext';
 import { useWishlist } from '@/components/WishlistContext';
 import Image from 'next/image';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { useGlobalSearch, ProductResult, CategoryResult } from "@/components/useGlobalSearch";
+
 
 interface HeaderProps {
     isLoggedIn?: boolean;
@@ -31,11 +34,10 @@ const Header: React.FC<HeaderProps> = ({
                                            isLoggedIn = false,
                                            userEmail = ""
                                        }) => {
-    const [searchQuery, setSearchQuery] = useState('');
     const [showVehicleDropdown, setShowVehicleDropdown] = useState(false);
-    const router = useRouter();
     const [vinInput, setVinInput] = useState("");
     const [categories, setCategories] = useState<Category[]>([]);
+    const router = useRouter();
 
     const [vehicle, setVehicle] = useState({
         year: "",
@@ -46,6 +48,32 @@ const Header: React.FC<HeaderProps> = ({
     const { cartCount } = useCart();
     const { wishlist } = useWishlist();
     const wishlistCount = wishlist.length;
+
+    const {
+        searchQuery,
+        setSearchQuery,
+        showSearchOverlay,
+        setShowSearchOverlay,
+        searchResults,
+        activeTab,
+        setActiveTab,
+        isLoading,
+        hasSearched,
+        overlayRef,
+        handleSearchOverlay,
+    } = useGlobalSearch();
+
+    // Close overlay on click outside
+    useEffect(() => {
+        if (!showSearchOverlay) return;
+        function handleClick(e: MouseEvent) {
+            if (overlayRef.current && (overlayRef.current as HTMLElement).contains(e.target as Node) === false) {
+                setShowSearchOverlay(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClick);
+        return () => document.removeEventListener('mousedown', handleClick);
+    }, [showSearchOverlay, overlayRef, setShowSearchOverlay]);
 
     // ✅ Fetch categories from backend
     useEffect(() => {
@@ -84,11 +112,6 @@ const Header: React.FC<HeaderProps> = ({
         // Implement search logic here
     }, [vehicle]);
 
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log('Searching for:', searchQuery);
-    };
-
     const handleDecodeVIN = () => {
         if (!vinInput || vinInput.length < 17) {
             alert("Please enter a valid VIN (at least 17 characters).");
@@ -97,6 +120,7 @@ const Header: React.FC<HeaderProps> = ({
         router.push(`/vin/${vinInput}`);
         setShowVehicleDropdown(false);
     };
+
 
     const AddVehicleDropdown = ({
                                     show,
@@ -410,13 +434,14 @@ const Header: React.FC<HeaderProps> = ({
 
                             {/* Search Bar */}
                             <div className="flex-1 max-w-lg mx-4 hidden md:block" style={{ maxWidth: '100%', marginLeft: 0, marginRight: 0 }}>
-                                <form onSubmit={handleSearch} className="relative">
+                                <form onSubmit={(e) => { setShowSearchOverlay(true); handleSearchOverlay(e); }} className="relative">
                                     <input
                                         type="text"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        placeholder="Search for products..."
+                                        placeholder="Search..."
                                         className="w-full px-4 py-2.5 pr-12 border-none rounded-sm outline-none focus:outline-none"
+                                        onFocus={() => setShowSearchOverlay(true)}
                                     />
                                     <button
                                         type="submit"
@@ -496,6 +521,117 @@ const Header: React.FC<HeaderProps> = ({
 
             {/* Mobile Sidebar Navigation */}
             <SidebarNav open={showVehicleDropdown} onClose={() => setShowVehicleDropdown(false)} />
+
+            {/* Search Overlay */}
+            {showSearchOverlay && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 " style={{ transition: 'opacity 0.3s' }}>
+                    <div ref={overlayRef} className="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-auto p-6 relative animate-slideInLeft">
+                        {/* Pixel-perfect search bar at the top of the overlay */}
+                        <form onSubmit={(e) => handleSearchOverlay(e)} className="relative mb-6">
+                          <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search..."
+                            className="w-full px-4 py-2.5 pr-12 border-none rounded-sm outline-none focus:outline-none"
+                            autoFocus
+                          />
+                          <button
+                            type="submit"
+                            className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-md text-black hover:bg-accent-50 transition-colors"
+                            aria-label="Search"
+                          >
+                            <SearchIcon/>
+                          </button>
+                        </form>
+                        <button
+                            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                            onClick={() => setShowSearchOverlay(false)}
+                            aria-label="Close search overlay"
+                        >
+                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                        <div className="flex gap-4 mb-4">
+                            <button className={`px-4 py-2 rounded font-semibold ${activeTab === 'products' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700'}`} onClick={() => setActiveTab('products')}>Products</button>
+                            <button className={`px-4 py-2 rounded font-semibold ${activeTab === 'categories' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700'}`} onClick={() => setActiveTab('categories')}>Categories</button>
+                            <button className={`px-4 py-2 rounded font-semibold ${activeTab === 'properties' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700'}`} onClick={() => setActiveTab('properties')}>Properties</button>
+                        </div>
+                        <div className="min-h-[200px] flex flex-col items-center justify-center">
+                            {isLoading ? (
+                                <LoadingSpinner size={40} />
+                            ) : !hasSearched ? (
+                                <Image src="/images/rafiki.svg" alt="Empty search" width={260} height={260} className="mb-4" />
+                            ) : (
+                                <>
+                                    {activeTab === 'products' && (
+                                      <>
+                                        <div className="w-full text-sm text-gray-600 mb-2">{searchResults.productCount} product{searchResults.productCount === 1 ? '' : 's'} found</div>
+                                        {searchResults.products.length > 0 ? (
+                                          <ul className="w-full">
+                                            {searchResults.products.map((product: ProductResult) => (
+                                              <li key={product.id} className="p-4 border-b flex gap-4 items-center">
+                                                <div className="flex-shrink-0">
+                                                  <Image src={product.image_url || '/images/rafiki.svg'} alt={product.name} width={160} height={160} className="rounded" />
+                                                </div>
+                                                <div className="flex-1">
+                                                  <Link href={`/product/${product.slug}`} className="text-orange-600 font-semibold text-lg">{product.name}</Link>
+                                                  <div className="text-sm text-gray-500">{product.category_name || product.category}</div>
+                                                    <div className="text-base font-bold text-gray-900">
+                                                        ${!isNaN(Number(product.price)) ? Number(product.price).toFixed(2) : product.price}
+                                                    </div>
+                                                  <div className="text-xs text-gray-500">{product.stock_status ? 'In Stock' : 'Out of Stock'}</div>
+                                                  <div className="text-xs text-gray-500">Warranty: {product.warranty} months</div>
+                                                  <div className="text-xs text-gray-500">Delivery: {product.delivery_days} days</div>
+                                                  <div className="text-xs text-gray-500">Return: {product.return_days} days</div>
+                                                  {product.description && <div className="text-xs text-gray-400 mt-1">{product.description}</div>}
+                                                </div>
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        ) : <div className="text-gray-500">No products found.</div>}
+                                        <div className="flex justify-between mt-4">
+                                          {searchResults.previous && (
+                                            <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleSearchOverlay(undefined, searchResults.previous!)}>Previous</button>
+                                          )}
+                                          {searchResults.next && (
+                                            <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 ml-auto" onClick={() => handleSearchOverlay(undefined, searchResults.next!)}>Next</button>
+                                          )}
+                                        </div>
+                                      </>
+                                    )}
+                                    {activeTab === 'categories' && (
+                                      <>
+                                        <div className="w-full text-sm text-gray-600 mb-2">{searchResults.categoryCount} categor{searchResults.categoryCount === 1 ? 'y' : 'ies'} found</div>
+                                        {searchResults.categories.length > 0 ? (
+                                          <ul className="w-full">
+                                            {searchResults.categories.map((category: CategoryResult) => (
+                                              <li key={category.id} className="p-2 border-b">
+                                                <Link href={`/parts/${category.slug}`} className="text-orange-600 font-semibold">{category.name}</Link>
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        ) : <div className="text-gray-500">No categories found.</div>}
+                                        <div className="flex justify-between mt-4">
+                                          {searchResults.previous && (
+                                            <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleSearchOverlay(undefined, searchResults.previous!)}>Previous</button>
+                                          )}
+                                          {searchResults.next && (
+                                            <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 ml-auto" onClick={() => handleSearchOverlay(undefined, searchResults.next!)}>Next</button>
+                                          )}
+                                        </div>
+                                      </>
+                                    )}
+                                    {activeTab === 'properties' && (
+                                        <div className="text-gray-500">No property search implemented.</div>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 };

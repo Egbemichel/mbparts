@@ -6,7 +6,6 @@ import { decodeVIN } from "@/lib/vinDecoder";
 import CarModel from "@/components/CarModel";
 import VinInfoCard from "@/components/VinInfoCard";
 import ColorPicker from "@/components/ColorPicker";
-import LoadingFallback from "@/components/ui/LoadingFallback";
 import ManIcon from "@/public/icons/ManIcon";
 import MakeIcon from "@/public/icons/MakeIcon";
 import ModelIcon from "@/public/icons/ModelIcon";
@@ -43,7 +42,7 @@ export default function VinDecoderPage({ params }: any) {
             .catch(() => setData({ error: "Failed to fetch VIN data" }));
     }, [vin]);
 
-    if ('loading' in data && data.loading) return <LoadingFallback />;
+    if ('loading' in data && data.loading) return null;
     if ('error' in data && data.error) return <p className="text-red-500">{data.error}</p>;
     if (!('raw' in data)) return null; // safety check
 

@@ -4,6 +4,7 @@ import { Calendar, User, Tag, ArrowRight, Search, Facebook, Twitter, Linkedin, S
 import ArrowLeftIcon from "@/public/icons/ArrowLeftIcon";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { LoadingProvider } from "@/components/LoadingContext";
 
 // Types
 interface BlogPost {
@@ -43,8 +44,8 @@ const blogPosts: BlogPost[] = [
       <h2>User Expectations</h2>
       <p>Modern consumers expect auto parts to last longer while maintaining optimal performance. This expectation drives manufacturers to invest in advanced materials and manufacturing processes.</p>
     `,
-        image: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=600&h=400&fit=crop",
-        author: "John Smith",
+        image: "/images/ceo.jpg",
+        author: "Benjamin Smith",
         date: "December 15, 2023",
         category: "Manufacturing",
         tags: ["Auto Parts", "Manufacturing", "Quality"],
@@ -60,7 +61,7 @@ const blogPosts: BlogPost[] = [
       <h2>Digital Shopping Revolution</h2>
       <p>Modern technology apps offer features like VIN scanning, part compatibility checking, and real-time inventory updates, making the shopping experience more efficient and accurate.</p>
     `,
-        image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop",
+        image: "/images/operations-manager.jpg",
         author: "Sarah Johnson",
         date: "December 12, 2023",
         category: "Technology",
@@ -74,7 +75,7 @@ const blogPosts: BlogPost[] = [
         content: `
       <p>As the automotive industry moves toward electrification and autonomous driving, the landscape of auto parts is rapidly evolving. Electronic components are becoming increasingly important in modern vehicles.</p>
     `,
-        image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=600&h=400&fit=crop",
+        image: "/images/mike.jpg",
         author: "Mike Wilson",
         date: "December 10, 2023",
         category: "Innovation",
@@ -88,7 +89,7 @@ const blogPosts: BlogPost[] = [
         content: `
       <p>The classic car restoration market is experiencing a renaissance, with enthusiasts seeking high-quality replacement parts to bring vintage vehicles back to their former glory.</p>
     `,
-        image: "https://images.unsplash.com/photo-1609721751653-44e3b8b4cc71?w=600&h=400&fit=crop",
+        image: "/images/restoration.jpg",
         author: "David Brown",
         date: "December 8, 2023",
         category: "Restoration",
@@ -107,22 +108,22 @@ const categories: Category[] = [
 const popularPosts = [
     {
         title: "Durable Auto Parts: Challenges for Manufacturers",
-        image: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=100&h=80&fit=crop",
+        image: "/images/auto-parts.jpg",
         date: "Dec 15, 2023"
     },
     {
         title: "Using Technology Apps for Convenient Auto Parts",
-        image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=100&h=80&fit=crop",
+        image: "/images/app.png",
         date: "Dec 12, 2023"
     },
     {
         title: "The Future of Auto Parts: Automotive Vehicles and...",
-        image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=100&h=80&fit=crop",
+        image: "/images/future.jpg",
         date: "Dec 10, 2023"
     },
     {
         title: "Restoring Classic Cars: The Growing Era of...",
-        image: "https://images.unsplash.com/photo-1609721751653-44e3b8b4cc71?w=100&h=80&fit=crop",
+        image: "/images/classic-car-restoration.jpg",
         date: "Dec 8, 2023"
     }
 ];
@@ -322,14 +323,14 @@ const SingleBlogPost: React.FC<{
                         {/* Additional Images */}
                         <div className="grid md:grid-cols-2 gap-6 my-8">
                             <Image
-                                src="https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=300&fit=crop"
+                                src="/images/multimedia.jpeg"
                                 alt="Auto parts manufacturing"
                                 className="w-full h-48 object-cover rounded-lg"
                                 width={300}
                                 height={48}
                             />
                             <Image
-                                src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&h=300&fit=crop"
+                                src="/images/radiator.jpg"
                                 alt="Car maintenance"
                                 className="w-full h-48 object-cover rounded-lg"
                                 width={300}
@@ -452,4 +453,10 @@ const BlogPage: React.FC = () => {
     );
 };
 
-export default BlogPage;
+export default function BlogPageWrapper() {
+  return (
+    <LoadingProvider>
+      <BlogPage />
+    </LoadingProvider>
+  );
+}

@@ -1,14 +1,58 @@
-// app/layout.tsx
-import ServerLayout, { metadata } from "./server-layout";
+import { LoadingProvider } from "@/components/LoadingContext";
+import ServerLayout from "./server-layout";
 import ClientLayout from "./client-layout";
 import "./globals.css";
 
-export { metadata };
+export const metadata = {
+    title: "MB Parts Assembly – Quality Auto Parts for Mercedes-Benz",
+    description:
+        "Find high-quality, genuine, and affordable auto parts for Mercedes-Benz vehicles. Shop engine parts, body parts, and accessories with fast delivery and warranty included.",
+    metadataBase: new URL("https://mbpartsassembly.com"),
+    icons: {
+        icon: "/mbparts_logo.ico",          // main favicon
+        shortcut: "/mbparts_logo.ico",      // shortcut icon
+        apple: "/mbparts_logo.png",   // optional for Apple devices
+    },
+    openGraph: {
+        type: "website",
+        url: "https://mbpartsassembly.com",
+        title: "MB Parts Assembly – Quality Auto Parts for Mercedes-Benz",
+        description:
+            "Shop trusted Mercedes-Benz parts with warranty and quick delivery. MB Parts Assembly is your reliable source for premium car parts online.",
+        images: [
+            {
+                url: "https://raw.githubusercontent.com/Egbemichel/images/refs/heads/main/mbparts_logo.png",
+                width: 1200,
+                height: 630,
+                alt: "MB Parts Assembly – Mercedes-Benz Parts Store",
+            },
+        ],
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "MB Parts Assembly – Quality Auto Parts for Mercedes-Benz",
+        description:
+            "Explore genuine Mercedes-Benz auto parts and accessories at affordable prices with fast delivery.",
+        images: ["https://raw.githubusercontent.com/Egbemichel/images/refs/heads/main/mbparts_logo.png"],
+    },
+    robots: { index: true, follow: true },
+    alternates: { canonical: "https://mbpartsassembly.com", },
+};
+
+export const viewport = {
+    themeColor: "#f54a00"
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <ServerLayout>
-            <ClientLayout>{children}</ClientLayout>
-        </ServerLayout>
+        <html lang="en">
+        <body className="antialiased min-h-screen flex flex-col">
+        <LoadingProvider>
+            <ServerLayout>
+                <ClientLayout>{children}</ClientLayout>
+            </ServerLayout>
+        </LoadingProvider>
+        </body>
+        </html>
     );
 }

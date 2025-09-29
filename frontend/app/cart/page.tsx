@@ -4,7 +4,8 @@ import React from 'react';
 import { useCart } from '@/components/CartContext';
 import { useRouter } from 'next/navigation';
 import ArrowLeftIcon from "@/public/icons/ArrowLeftIcon";
-import CartItem from '@/components/CartItem'; // Ensure path is correct
+import CartItem from '@/components/CartItem';
+import Image from "next/image"; // Ensure path is correct
 
 export default function CartPage() {
     const { cart, removeFromCart, clearCart  } = useCart();
@@ -30,7 +31,25 @@ export default function CartPage() {
             <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
 
             {cart.length === 0 ? (
-                <div className="text-gray-500">Your cart is empty.</div>
+                <div className="flex flex-col items-center justify-center py-16 w-full">
+                    {/* Responsive SVG image */}
+                    <Image
+                        src="/images/oc-empty-cart.svg"
+                        alt="Empty cart illustration"
+                        className="mb-6 w-40 sm:w-56 h-auto object-contain"
+                        loading="lazy"
+                        height={200}
+                        width={400}
+                    />
+                    <div className="text-lg sm:text-xl text-gray-500 mb-4 text-center font-medium">Your cart is empty.</div>
+                    <button
+                        onClick={() => router.push('/shop')}
+                        className="mt-2 px-6 py-3 bg-orange-500 text-white font-semibold text-base shadow hover:bg-orange-600 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-400"
+                        aria-label="Go to Shop"
+                    >
+                        Continue to Shop
+                    </button>
+                </div>
             ) : (
                 <>
                     <div className="divide-y divide-gray-200 mb-8">

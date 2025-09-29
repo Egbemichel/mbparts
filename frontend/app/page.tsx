@@ -14,6 +14,7 @@ import LatestProductWrapper from "@/components/LatestProductWrapper";
 //import Services from "@/components/Services";
 import PaymentCarousel from "@/components/PaymentCarrousel";
 import PopularAccessories from "@/components/PopularAccessories";
+export const dynamic = 'force-dynamic';
 
 
 

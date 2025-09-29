@@ -1,6 +1,6 @@
 // app/parts/layout.tsx
-import { ReactNode } from 'react';
 import NavbarHome from "@/components/NavbarHome";
+import { ReactNode } from 'react';
 
 export default function PartsLayout({ children }: { children: ReactNode }) {
     return (

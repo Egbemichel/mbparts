@@ -66,14 +66,14 @@ const IntroSection: React.FC = () => {
 
     const teamMembers: TeamMember[] = [
         {
-            name: "John Smith",
+            name: "Benjamin Smith",
             role: "CEO & Founder",
-            image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop&crop=face"
+            image: "/images/ceo.jpg"
         },
         {
             name: "Sarah Johnson",
             role: "Operations Manager",
-            image: "https://images.unsplash.com/photo-1494790108755-2616b612b1c0?w=60&h=60&fit=crop&crop=face"
+            image: "/images/operations-manager.jpg"
         }
     ];
 
@@ -85,7 +85,7 @@ const IntroSection: React.FC = () => {
                     <div className="lg:w-1/2 relative">
                         <div className="relative">
                             <Image
-                                src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&h=400&fit=crop"
+                                src="/images/mission.png"
                                 alt="Auto parts warehouse"
                                 className="w-full h-80 lg:h-96 object-cover rounded-lg shadow-lg"
                                 width={100}
@@ -249,7 +249,7 @@ const ReasonsSection: React.FC = () => {
                         </div>
                         <div className="lg:w-1/3">
                             <Image
-                                src="https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=300&fit=crop"
+                                src="/images/maintenance.jpg"
                                 alt="Auto parts"
                                 className="w-full h-64 lg:h-full object-cover"
                                 width={300}

@@ -6,8 +6,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q
+from rest_framework.generics import ListAPIView
 
-from .models import Part, Category, PartsAdmin
+from .models import Category, PartsAdmin, Part
 from .serializers import PartSerializer, PartsAdminDetailSerializer, PartsAdminSerializer, CategorySerializer, \
     CategoryWithProductsSerializer
 from rest_framework.permissions import IsAuthenticated  # restrict to logged-in admin
@@ -267,3 +269,45 @@ def public_parts_admin_list(request):
     result_page = paginator.paginate_queryset(parts, request)
     serializer = PartsAdminSerializer(result_page, many=True)
     return paginator.get_paginated_response(serializer.data)
+
+class SearchView(ListAPIView):
+    pagination_class = FitmentPagination
+
+    def get(self, request, *args, **kwargs):
+        query = request.GET.get('q', '').strip()
+        if not query:
+            return Response({'results': [], 'count': 0})
+
+        # Product search (PartsAdmin)
+        product_q = (
+            Q(name__icontains=query) |
+            Q(price__icontains=query) |
+            Q(new_category__name__icontains=query) |
+            Q(new_category__description__icontains=query) |
+            Q(stock_status__icontains=query) |
+            Q(warranty__icontains=query) |
+            Q(delivery_days__icontains=query) |
+            Q(return_days__icontains=query) |
+            Q(description__icontains=query)
+        )
+        products = PartsAdmin.objects.filter(product_q).select_related('new_category').distinct()
+        product_page = self.paginate_queryset(products)
+        product_serializer = PartsAdminDetailSerializer(product_page, many=True)
+
+        # Category search
+        category_q = (
+            Q(name__icontains=query) |
+            Q(description__icontains=query)
+        )
+        categories = Category.objects.filter(category_q).distinct()
+        category_page = self.paginate_queryset(categories)
+        category_serializer = CategorySerializer(category_page, many=True)
+
+        # Combine results
+        results = {
+            'products': product_serializer.data,
+            'categories': category_serializer.data,
+            'product_count': products.count(),
+            'category_count': categories.count(),
+        }
+        return self.get_paginated_response(results)

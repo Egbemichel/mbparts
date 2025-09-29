@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import LoadingFallback from "@/components/ui/LoadingFallback";
 import { VehicleInfo, PaginatedParts } from "@/lib/types";
+import { useFetchWithLoading } from "@/lib/fetchWithLoading";
 
 import WishlistIcon from "@/public/icons/WishlistIcon";
 import GitCompareIcon from "@/public/icons/GitCompare";
@@ -19,13 +19,14 @@ export default function VinResults({ vehicleInfo }: { vehicleInfo: VehicleInfo }
     const [error, setError] = useState<string | null>(null);
     const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
     const [wishlistItems, setWishlistItems] = useState<Set<string>>(new Set());
+    const fetchWithLoading = useFetchWithLoading();
 
     const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
     const fetchFitment = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await fetch(`${BASE_URL}/parts/fitment/`, {
+            const res = await fetchWithLoading(`${BASE_URL}/parts/fitment/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(vehicleInfo),
@@ -43,15 +44,13 @@ export default function VinResults({ vehicleInfo }: { vehicleInfo: VehicleInfo }
         } finally {
             setLoading(false);
         }
-    }, [BASE_URL, vehicleInfo]);
+    }, [BASE_URL, vehicleInfo, fetchWithLoading]);
 
     async function fetchPage(category: string, pageNumber: number) {
         try {
             const paramName = `page_${category.toLowerCase().replace(/\s+/g, "_")}`;
-            const res = await fetch(`${BASE_URL}/parts/fitment/?${paramName}=${pageNumber}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(vehicleInfo),
+            const res = await fetchWithLoading(`${BASE_URL}/parts/fitment/?${paramName}=${pageNumber}`, {
+                method: "GET",
             });
 
             if (!res.ok) throw new Error("Failed to fetch page");
@@ -89,7 +88,7 @@ export default function VinResults({ vehicleInfo }: { vehicleInfo: VehicleInfo }
             />
         ));
 
-    if (loading) return <LoadingFallback />;
+    if (loading) return null;
     if (error) return <p className="text-red-500">{error}</p>;
     if (!fitment || Object.keys(fitment).length === 0) return <p>No compatible parts found.</p>;
 

@@ -4,8 +4,8 @@ import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { Product } from "@/lib/types";
 import { Separator } from "@/components/ui/separator";
-import LoadingFallback from "@/components/ui/LoadingFallback";
 import { useCart } from "@/components/CartContext";
+import { useFetchWithLoading } from "@/lib/fetchWithLoading";
 
 interface AccessoriesClientProps {
     categorySlug: string;
@@ -28,6 +28,7 @@ const AccessoriesClient: React.FC<AccessoriesClientProps> = ({ categorySlug, cat
     const [totalCount, setTotalCount] = useState(0);
     const [quantity, setQuantity] = useState(1);
     const { addToCart } = useCart();
+    const fetchWithLoading = useFetchWithLoading();
 
     const endpoint = useMemo(
         () => `${process.env.NEXT_PUBLIC_API_URL}/parts/parts-public/`,
@@ -49,25 +50,25 @@ const AccessoriesClient: React.FC<AccessoriesClientProps> = ({ categorySlug, cat
                 if (priceRange[0] > 0) params.append("min_price", priceRange[0].toString());
                 if (priceRange[1] < 10000) params.append("max_price", priceRange[1].toString());
 
-                const res = await fetch(`${endpoint}?${params.toString()}`);
+                const res = await fetchWithLoading(`${endpoint}?${params.toString()}`);
                 if (!res.ok) throw new Error("Failed to fetch products");
 
                 const data: PaginatedResponse = await res.json();
 
                 if (isMounted) {
-                    setProducts(data.results || []);
+                    setProducts(data.results);
                     setTotalCount(data.count);
                 }
             } catch (err) {
                 console.error(err);
             } finally {
-                if (isMounted) setLoading(false);
+                setLoading(false);
             }
         }
 
         fetchProducts();
         return () => { isMounted = false; };
-    }, [endpoint, page, pageSize, priceRange, categorySlug]);
+    }, [endpoint, page, pageSize, priceRange, categorySlug, fetchWithLoading]);
 
     const totalPages = Math.ceil(totalCount / pageSize);
 
@@ -82,7 +83,7 @@ const AccessoriesClient: React.FC<AccessoriesClientProps> = ({ categorySlug, cat
 
     const handleQuantityChange = (delta: number) => setQuantity(prev => Math.max(1, prev + delta));
 
-    if (loading) return <div className="text-center py-12"><LoadingFallback /></div>;
+    if (loading) return null;
     if (products.length === 0) return <p className="text-center py-12">No products available.</p>;
 
     return (

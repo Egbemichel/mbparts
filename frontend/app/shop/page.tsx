@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import LatestProductsWrapper from '@/components/LatestProductWrapper';
 import LatestProducts from '@/components/LatestProducts';
 import { Product } from "@/lib/types";
+import { useFetchWithLoading } from "@/lib/fetchWithLoading";
 
 // Sidebar Component
 const Sidebar: React.FC<{
@@ -110,24 +111,35 @@ const ShopPage: React.FC = () => {
     const [categories, setCategories] = useState<CategoryType[]>([]);
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
+    const [error, setError] = useState<string | null>(null);
     const router = useRouter();
+    const fetchWithLoading = useFetchWithLoading();
 
     // Fetch categories from API
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/parts/categories/`)
-            .then(res => res.json())
-            .then(data => {
-                // Convert flat list to tree
-                const map: Record<number, CategoryType> = {};
-                const roots: CategoryType[] = [];
-                data.results.forEach((c: CategoryType) => { map[c.id] = { ...c, children: [] }; });
-                data.results.forEach((c: CategoryType) => {
-                    if (c.parent) map[c.parent]?.children?.push(map[c.id]);
-                    else roots.push(map[c.id]);
-                });
-                setCategories(roots);
-            });
-    }, []);
+        const fetchCategories = async () => {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+            if (!apiUrl) {
+                setError('API URL is not defined.');
+                return;
+            }
+            try {
+                const res = await fetchWithLoading(`${apiUrl}/parts/categories/`);
+                if (!res.ok) throw new Error('Failed to fetch categories');
+                const data = await res.json();
+                console.log('Categories API response:', data); // Debug log
+                const categoriesArray = Array.isArray(data)
+                    ? data
+                    : Array.isArray(data.results)
+                        ? data.results
+                        : [];
+                setCategories(categoriesArray);
+            } catch (err) {
+                setError((err as Error).message || 'Failed to load categories');
+            }
+        };
+        fetchCategories();
+    }, [fetchWithLoading]); // Run only once on mount, but include fetchWithLoading
 
     const handleAddToCart = (product: Product) => {
         console.log(`Added product ${product.id} to cart`);
@@ -174,6 +186,11 @@ const ShopPage: React.FC = () => {
                 </div>
 
                 <div className="flex-1">
+                    {error && (
+                        <div className="p-4 bg-red-100 text-red-700 rounded mb-4">
+                            {error}
+                        </div>
+                    )}
                     <LatestProductsWrapper
                         title=""
                         showViewAll={false}
