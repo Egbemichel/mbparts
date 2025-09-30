@@ -49,6 +49,7 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
         setActiveTab,
         isLoading,
         hasSearched,
+        setHasSearched,
         overlayRef,
         handleSearchOverlay,
         showSearchOverlay,
@@ -142,6 +143,23 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
+
+    // Helper to reset search overlay state
+    const handleCloseSearchOverlay = React.useCallback(() => {
+        setShowSearchOverlay(false);
+        setSearchQuery("");
+        setActiveTab("products");
+        setHasSearched(false);
+        if (typeof searchResults === "object") {
+            searchResults.products = [];
+            searchResults.categories = [];
+            searchResults.productCount = 0;
+            searchResults.categoryCount = 0;
+            searchResults.next = null;
+            searchResults.previous = null;
+            searchResults.count = 0;
+        }
+    }, [setShowSearchOverlay, setSearchQuery, setActiveTab, searchResults]);
 
     return (
         <div ref={navRef} className="relative">
@@ -294,7 +312,7 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
                                 </form>
                                 <button
                                     className="absolute top-1 right-1.5 text-gray-500 hover:text-gray-700"
-                                    onClick={() => setShowSearchOverlay(false)}
+                                    onClick={handleCloseSearchOverlay}
                                     aria-label="Close search overlay"
                                 >
                                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -340,14 +358,6 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
                                                                 ))}
                                                             </ul>
                                                         ) : <div className="text-gray-500">No products found.</div>}
-                                                        <div className="flex justify-between mt-4">
-                                                            {searchResults.previous && (
-                                                                <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleSearchOverlay(undefined, searchResults.previous!)}>Previous</button>
-                                                            )}
-                                                            {searchResults.next && (
-                                                                <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 ml-auto" onClick={() => handleSearchOverlay(undefined, searchResults.next!)}>Next</button>
-                                                            )}
-                                                        </div>
                                                     </>
                                                 )}
                                                 {activeTab === 'categories' && (
@@ -362,17 +372,18 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
                                                                 ))}
                                                             </ul>
                                                         ) : <div className="text-gray-500">No categories found.</div>}
-                                                        <div className="flex justify-between mt-4">
-                                                            {searchResults.previous && (
-                                                                <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleSearchOverlay(undefined, searchResults.previous!)}>Previous</button>
-                                                            )}
-                                                            {searchResults.next && (
-                                                                <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 ml-auto" onClick={() => handleSearchOverlay(undefined, searchResults.next!)}>Next</button>
-                                                            )}
-                                                        </div>
                                                     </>
                                                 )}
                                             </>
+                                        )}
+                                    </div>
+                                    {/* Pagination controls always visible at bottom */}
+                                    <div className="flex justify-between mt-4 w-full">
+                                        {searchResults.previous && (
+                                            <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleSearchOverlay(undefined, searchResults.previous!)} disabled={isLoading}>Previous</button>
+                                        )}
+                                        {searchResults.next && (
+                                            <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 ml-auto" onClick={() => handleSearchOverlay(undefined, searchResults.next!)} disabled={isLoading}>Next</button>
                                         )}
                                     </div>
                                 </div>

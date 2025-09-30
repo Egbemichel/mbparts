@@ -95,7 +95,6 @@ const PopularAccessories: React.FC<CategoriesCarouselProps> = ({
                                     {category.productCount} product(s)
                                 </div>
                             </Link>
-                            <Separator className="my-2" />
                         </React.Fragment>
                     ))}
                 </div>

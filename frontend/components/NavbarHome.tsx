@@ -35,6 +35,7 @@ const Header: React.FC<HeaderProps> = ({
                                            userEmail = ""
                                        }) => {
     const [showVehicleDropdown, setShowVehicleDropdown] = useState(false);
+    const [showMobileSidebar, setShowMobileSidebar] = useState(false);
     const [vinInput, setVinInput] = useState("");
     const [categories, setCategories] = useState<Category[]>([]);
     const router = useRouter();
@@ -59,6 +60,7 @@ const Header: React.FC<HeaderProps> = ({
         setActiveTab,
         isLoading,
         hasSearched,
+        setHasSearched,
         overlayRef,
         handleSearchOverlay,
     } = useGlobalSearch();
@@ -69,6 +71,7 @@ const Header: React.FC<HeaderProps> = ({
         function handleClick(e: MouseEvent) {
             if (overlayRef.current && !(overlayRef.current as HTMLElement).contains(e.target as Node)) {
                 setShowSearchOverlay(false);
+                setHasSearched(false); // Reset hasSearched when overlay is closed by clicking outside
             }
         }
         document.addEventListener('mousedown', handleClick);
@@ -339,6 +342,24 @@ const Header: React.FC<HeaderProps> = ({
     };
 
 
+    // Helper to reset search overlay state
+    const handleCloseSearchOverlay = useCallback(() => {
+        setShowSearchOverlay(false);
+        setSearchQuery("");
+        setActiveTab("products");
+        setHasSearched(false);
+        if (typeof searchResults === "object") {
+            searchResults.products = [];
+            searchResults.categories = [];
+            searchResults.productCount = 0;
+            searchResults.categoryCount = 0;
+            searchResults.next = null;
+            searchResults.previous = null;
+            searchResults.count = 0;
+        }
+    }, [setShowSearchOverlay, setSearchQuery, setActiveTab, setHasSearched, searchResults]);
+
+
     return (
         <>
             <header className="bg-white border-gray-200">
@@ -347,7 +368,7 @@ const Header: React.FC<HeaderProps> = ({
                         {/* Mobile Menu Button */}
                         <div className="block sm:hidden px-2">
                             <button
-                                onClick={() => setShowVehicleDropdown(true)}
+                                onClick={() => setShowMobileSidebar(true)}
                                 className="text-gray-700 hover:text-primary-100 transition-colors"
                                 aria-label="Open menu"
                             >
@@ -372,7 +393,7 @@ const Header: React.FC<HeaderProps> = ({
                             className="p-0.5 border-accent-50 rounded-sm ml-10 mr-10 flex items-center justify-between w-full max-w-2xl"
                             style={{ maxWidth: '100%' }}
                         >
-                            {/* Add Vehicle Button */}
+                            {/* Add Vehicle Button (desktop only) */}
                             <div className="block w-full max-w-xs">
                                 <div className="relative w-full hidden md:block">
                                     <button
@@ -529,7 +550,7 @@ const Header: React.FC<HeaderProps> = ({
             </header>
 
             {/* Mobile Sidebar Navigation */}
-            <SidebarNav open={showVehicleDropdown} onClose={() => setShowVehicleDropdown(false)} />
+            <SidebarNav open={showMobileSidebar} onClose={() => setShowMobileSidebar(false)} />
 
             {/* Search Overlay */}
             {showSearchOverlay && (
@@ -555,7 +576,7 @@ const Header: React.FC<HeaderProps> = ({
                         </form>
                         <button
                             className="absolute top-1 right-2 text-gray-500 hover:text-gray-700"
-                            onClick={() => setShowSearchOverlay(false)}
+                            onClick={handleCloseSearchOverlay}
                             aria-label="Close search overlay"
                         >
                             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -574,71 +595,64 @@ const Header: React.FC<HeaderProps> = ({
                             ) : (
                                 <>
                                     {hasSearched && (
-                                      <div className="w-full max-h-[70vh] overflow-y-auto">
-                                        {activeTab === 'products' && (
-                                          <>
-                                            <div className="w-full text-sm text-gray-600 mb-2">{searchResults.productCount} product{searchResults.productCount === 1 ? '' : 's'} found</div>
-                                            {searchResults.products.length > 0 ? (
-                                              <ul className="w-full">
-                                                {searchResults.products.map((product: ProductResult) => (
-                                                  <li key={product.id} className="p-4 border-b flex gap-4 items-center">
-                                                    <div className="flex-shrink-0">
-                                                      <Image src={product.image_url || '/images/rafiki.svg'} alt={product.name} width={160} height={160} className="rounded" />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                      <Link href={`/product/${product.slug}`} className="text-orange-600 font-semibold text-lg">{product.name}</Link>
-                                                      <div className="text-sm text-gray-500">{product.category_name || product.category}</div>
-                                                        <div className="text-base font-bold text-gray-900">
-                                                            ${!isNaN(Number(product.price)) ? Number(product.price).toFixed(2) : product.price}
-                                                        </div>
-                                                      <div className="text-xs text-gray-500">{product.stock_status ? 'In Stock' : 'Out of Stock'}</div>
-                                                      <div className="text-xs text-gray-500">Warranty: {product.warranty} months</div>
-                                                      <div className="text-xs text-gray-500">Delivery: {product.delivery_days} days</div>
-                                                      <div className="text-xs text-gray-500">Return: {product.return_days} days</div>
-                                                      {product.description && <div className="text-xs text-gray-400 mt-1">{product.description}</div>}
-                                                    </div>
-                                                  </li>
-                                                ))}
-                                              </ul>
-                                            ) : (
-                                              <div className="text-gray-400 text-center">No products found.</div>
+                                        <div className="w-full max-h-[70vh] overflow-y-auto">
+                                            {activeTab === 'products' && (
+                                                <>
+                                                    <div className="w-full text-sm text-gray-600 mb-2">{searchResults.productCount} product{searchResults.productCount === 1 ? '' : 's'} found</div>
+                                                    {searchResults.products.length > 0 ? (
+                                                        <ul className="w-full">
+                                                            {searchResults.products.map((product: ProductResult) => (
+                                                                <li key={product.id} className="p-4 border-b flex gap-4 items-center">
+                                                                    <div className="flex-shrink-0">
+                                                                        <Image src={product.image_url || '/images/rafiki.svg'} alt={product.name} width={160} height={160} className="rounded" />
+                                                                    </div>
+                                                                    <div className="flex-1">
+                                                                        <Link href={`/product/${product.slug}`} className="text-orange-600 font-semibold text-lg">{product.name}</Link>
+                                                                        <div className="text-sm text-gray-500">{product.category_name || product.category}</div>
+                                                                          <div className="text-base font-bold text-gray-900">
+                                                                              ${!isNaN(Number(product.price)) ? Number(product.price).toFixed(2) : product.price}
+                                                                          </div>
+                                                                        <div className="text-xs text-gray-500">{product.stock_status ? 'In Stock' : 'Out of Stock'}</div>
+                                                                        <div className="text-xs text-gray-500">Warranty: {product.warranty} months</div>
+                                                                        <div className="text-xs text-gray-500">Delivery: {product.delivery_days} days</div>
+                                                                        <div className="text-xs text-gray-500">Return: {product.return_days} days</div>
+                                                                        {product.description && <div className="text-xs text-gray-400 mt-1">{product.description}</div>}
+                                                                    </div>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    ) : (
+                                                        <div className="text-gray-400 text-center">No products found.</div>
+                                                    )}
+                                                </>
                                             )}
-                                            <div className="flex justify-between mt-4">
-                                              {searchResults.previous && (
-                                                <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleSearchOverlay(undefined, searchResults.previous!)}>Previous</button>
-                                              )}
-                                              {searchResults.next && (
-                                                <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 ml-auto" onClick={() => handleSearchOverlay(undefined, searchResults.next!)}>Next</button>
-                                              )}
-                                            </div>
-                                          </>
-                                        )}
-                                        {activeTab === 'categories' && (
-                                          <>
-                                            <div className="w-full text-sm text-gray-600 mb-2">{searchResults.categoryCount} categor{searchResults.categoryCount === 1 ? 'y' : 'ies'} found</div>
-                                            {searchResults.categories.length > 0 ? (
-                                              <ul className="w-full">
-                                                {searchResults.categories.map((category: CategoryResult) => (
-                                                  <li key={category.id} className="p-2 border-b">
-                                                    <Link href={`/parts/${category.slug}`} className="text-orange-600 font-semibold">{category.name}</Link>
-                                                  </li>
-                                                ))}
-                                              </ul>
-                                            ) : (
-                                              <div className="text-gray-400 text-center">No categories found.</div>
+                                            {activeTab === 'categories' && (
+                                                <>
+                                                    <div className="w-full text-sm text-gray-600 mb-2">{searchResults.categoryCount} categor{searchResults.categoryCount === 1 ? 'y' : 'ies'} found</div>
+                                                    {searchResults.categories.length > 0 ? (
+                                                        <ul className="w-full">
+                                                            {searchResults.categories.map((category: CategoryResult) => (
+                                                                <li key={category.id} className="p-2 border-b">
+                                                                    <Link href={`/parts/${category.slug}`} className="text-orange-600 font-semibold">{category.name}</Link>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    ) : (
+                                                        <div className="text-gray-400 text-center">No categories found.</div>
+                                                    )}
+                                                </>
                                             )}
-                                            <div className="flex justify-between mt-4">
-                                              {searchResults.previous && (
-                                                <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleSearchOverlay(undefined, searchResults.previous!)}>Previous</button>
-                                              )}
-                                              {searchResults.next && (
-                                                <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 ml-auto" onClick={() => handleSearchOverlay(undefined, searchResults.next!)}>Next</button>
-                                              )}
-                                            </div>
-                                          </>
-                                        )}
-                                      </div>
+                                        </div>
                                     )}
+                                    {/* Pagination controls always visible at bottom */}
+                                    <div className="flex justify-between mt-4 w-full">
+                                        {searchResults.previous && (
+                                            <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleSearchOverlay(undefined, searchResults.previous!)} disabled={isLoading}>Previous</button>
+                                        )}
+                                        {searchResults.next && (
+                                            <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 ml-auto" onClick={() => handleSearchOverlay(undefined, searchResults.next!)} disabled={isLoading}>Next</button>
+                                        )}
+                                    </div>
                                 </>
                             )}
                         </div>
