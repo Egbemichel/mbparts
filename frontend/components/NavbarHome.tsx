@@ -75,17 +75,6 @@ const Header: React.FC<HeaderProps> = ({
         return () => document.removeEventListener('mousedown', handleClick);
     }, [showSearchOverlay, overlayRef, setShowSearchOverlay]);
 
-    // Prevent background scrolling when search overlay is open
-    useEffect(() => {
-        if (showSearchOverlay) {
-            document.body.classList.add('overflow-hidden');
-        } else {
-            document.body.classList.remove('overflow-hidden');
-        }
-        return () => {
-            document.body.classList.remove('overflow-hidden');
-        };
-    }, [showSearchOverlay]);
 
     // ✅ Fetch categories from backend
     useEffect(() => {

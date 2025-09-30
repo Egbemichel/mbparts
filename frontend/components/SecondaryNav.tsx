@@ -143,18 +143,6 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Prevent background scrolling when search overlay is open
-    useEffect(() => {
-        if (showSearchOverlay) {
-            document.body.classList.add('overflow-hidden');
-        } else {
-            document.body.classList.remove('overflow-hidden');
-        }
-        return () => {
-            document.body.classList.remove('overflow-hidden');
-        };
-    }, [showSearchOverlay]);
-
     return (
         <div ref={navRef} className="relative">
             {/* Desktop Navigation */}
