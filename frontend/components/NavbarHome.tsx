@@ -75,6 +75,18 @@ const Header: React.FC<HeaderProps> = ({
         return () => document.removeEventListener('mousedown', handleClick);
     }, [showSearchOverlay, overlayRef, setShowSearchOverlay]);
 
+    // Prevent background scrolling when search overlay is open
+    useEffect(() => {
+        if (showSearchOverlay) {
+            document.body.classList.add('overflow-hidden');
+        } else {
+            document.body.classList.remove('overflow-hidden');
+        }
+        return () => {
+            document.body.classList.remove('overflow-hidden');
+        };
+    }, [showSearchOverlay]);
+
     // ✅ Fetch categories from backend
     useEffect(() => {
         const abortController = new AbortController();
@@ -572,63 +584,71 @@ const Header: React.FC<HeaderProps> = ({
                                 <Image src="/images/rafiki.svg" alt="Empty search" width={260} height={260} className="mb-4" />
                             ) : (
                                 <>
-                                    {activeTab === 'products' && (
-                                      <>
-                                        <div className="w-full text-sm text-gray-600 mb-2">{searchResults.productCount} product{searchResults.productCount === 1 ? '' : 's'} found</div>
-                                        {searchResults.products.length > 0 ? (
-                                          <ul className="w-full">
-                                            {searchResults.products.map((product: ProductResult) => (
-                                              <li key={product.id} className="p-4 border-b flex gap-4 items-center">
-                                                <div className="flex-shrink-0">
-                                                  <Image src={product.image_url || '/images/rafiki.svg'} alt={product.name} width={160} height={160} className="rounded" />
-                                                </div>
-                                                <div className="flex-1">
-                                                  <Link href={`/product/${product.slug}`} className="text-orange-600 font-semibold text-lg">{product.name}</Link>
-                                                  <div className="text-sm text-gray-500">{product.category_name || product.category}</div>
-                                                    <div className="text-base font-bold text-gray-900">
-                                                        ${!isNaN(Number(product.price)) ? Number(product.price).toFixed(2) : product.price}
+                                    {hasSearched && (
+                                      <div className="w-full max-h-[70vh] overflow-y-auto">
+                                        {activeTab === 'products' && (
+                                          <>
+                                            <div className="w-full text-sm text-gray-600 mb-2">{searchResults.productCount} product{searchResults.productCount === 1 ? '' : 's'} found</div>
+                                            {searchResults.products.length > 0 ? (
+                                              <ul className="w-full">
+                                                {searchResults.products.map((product: ProductResult) => (
+                                                  <li key={product.id} className="p-4 border-b flex gap-4 items-center">
+                                                    <div className="flex-shrink-0">
+                                                      <Image src={product.image_url || '/images/rafiki.svg'} alt={product.name} width={160} height={160} className="rounded" />
                                                     </div>
-                                                  <div className="text-xs text-gray-500">{product.stock_status ? 'In Stock' : 'Out of Stock'}</div>
-                                                  <div className="text-xs text-gray-500">Warranty: {product.warranty} months</div>
-                                                  <div className="text-xs text-gray-500">Delivery: {product.delivery_days} days</div>
-                                                  <div className="text-xs text-gray-500">Return: {product.return_days} days</div>
-                                                  {product.description && <div className="text-xs text-gray-400 mt-1">{product.description}</div>}
-                                                </div>
-                                              </li>
-                                            ))}
-                                          </ul>
-                                        ) : <div className="text-gray-500">No products found.</div>}
-                                        <div className="flex justify-between mt-4">
-                                          {searchResults.previous && (
-                                            <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleSearchOverlay(undefined, searchResults.previous!)}>Previous</button>
-                                          )}
-                                          {searchResults.next && (
-                                            <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 ml-auto" onClick={() => handleSearchOverlay(undefined, searchResults.next!)}>Next</button>
-                                          )}
-                                        </div>
-                                      </>
-                                    )}
-                                    {activeTab === 'categories' && (
-                                      <>
-                                        <div className="w-full text-sm text-gray-600 mb-2">{searchResults.categoryCount} categor{searchResults.categoryCount === 1 ? 'y' : 'ies'} found</div>
-                                        {searchResults.categories.length > 0 ? (
-                                          <ul className="w-full">
-                                            {searchResults.categories.map((category: CategoryResult) => (
-                                              <li key={category.id} className="p-2 border-b">
-                                                <Link href={`/parts/${category.slug}`} className="text-orange-600 font-semibold">{category.name}</Link>
-                                              </li>
-                                            ))}
-                                          </ul>
-                                        ) : <div className="text-gray-500">No categories found.</div>}
-                                        <div className="flex justify-between mt-4">
-                                          {searchResults.previous && (
-                                            <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleSearchOverlay(undefined, searchResults.previous!)}>Previous</button>
-                                          )}
-                                          {searchResults.next && (
-                                            <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 ml-auto" onClick={() => handleSearchOverlay(undefined, searchResults.next!)}>Next</button>
-                                          )}
-                                        </div>
-                                      </>
+                                                    <div className="flex-1">
+                                                      <Link href={`/product/${product.slug}`} className="text-orange-600 font-semibold text-lg">{product.name}</Link>
+                                                      <div className="text-sm text-gray-500">{product.category_name || product.category}</div>
+                                                        <div className="text-base font-bold text-gray-900">
+                                                            ${!isNaN(Number(product.price)) ? Number(product.price).toFixed(2) : product.price}
+                                                        </div>
+                                                      <div className="text-xs text-gray-500">{product.stock_status ? 'In Stock' : 'Out of Stock'}</div>
+                                                      <div className="text-xs text-gray-500">Warranty: {product.warranty} months</div>
+                                                      <div className="text-xs text-gray-500">Delivery: {product.delivery_days} days</div>
+                                                      <div className="text-xs text-gray-500">Return: {product.return_days} days</div>
+                                                      {product.description && <div className="text-xs text-gray-400 mt-1">{product.description}</div>}
+                                                    </div>
+                                                  </li>
+                                                ))}
+                                              </ul>
+                                            ) : (
+                                              <div className="text-gray-400 text-center">No products found.</div>
+                                            )}
+                                            <div className="flex justify-between mt-4">
+                                              {searchResults.previous && (
+                                                <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleSearchOverlay(undefined, searchResults.previous!)}>Previous</button>
+                                              )}
+                                              {searchResults.next && (
+                                                <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 ml-auto" onClick={() => handleSearchOverlay(undefined, searchResults.next!)}>Next</button>
+                                              )}
+                                            </div>
+                                          </>
+                                        )}
+                                        {activeTab === 'categories' && (
+                                          <>
+                                            <div className="w-full text-sm text-gray-600 mb-2">{searchResults.categoryCount} categor{searchResults.categoryCount === 1 ? 'y' : 'ies'} found</div>
+                                            {searchResults.categories.length > 0 ? (
+                                              <ul className="w-full">
+                                                {searchResults.categories.map((category: CategoryResult) => (
+                                                  <li key={category.id} className="p-2 border-b">
+                                                    <Link href={`/parts/${category.slug}`} className="text-orange-600 font-semibold">{category.name}</Link>
+                                                  </li>
+                                                ))}
+                                              </ul>
+                                            ) : (
+                                              <div className="text-gray-400 text-center">No categories found.</div>
+                                            )}
+                                            <div className="flex justify-between mt-4">
+                                              {searchResults.previous && (
+                                                <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleSearchOverlay(undefined, searchResults.previous!)}>Previous</button>
+                                              )}
+                                              {searchResults.next && (
+                                                <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 ml-auto" onClick={() => handleSearchOverlay(undefined, searchResults.next!)}>Next</button>
+                                              )}
+                                            </div>
+                                          </>
+                                        )}
+                                      </div>
                                     )}
                                 </>
                             )}
