@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import LatestProductsOriginal from './LatestProducts';
 import { Product } from '@/lib/types';
+import { useFetchWithLoading } from '@/lib/fetchWithLoading';
 
 interface LatestProductsWrapperProps {
     title?: string;
@@ -29,26 +30,20 @@ const LatestProductsWrapper: React.FC<LatestProductsWrapperProps> = ({
                                                                          children,
                                                                      }) => {
     const [products, setProducts] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [initialLoad, setInitialLoad] = useState(true);
     const [page, setPage] = useState(1);
     const [pageSize] = useState(12);
     const [totalCount, setTotalCount] = useState(0);
-
     const endpoint = useMemo(() => `${process.env.NEXT_PUBLIC_API_URL}/parts/parts-public/`, []);
+    const fetchWithLoading = useFetchWithLoading();
 
     useEffect(() => {
-        let isMounted = true;
-
+        let mounted = true;
         async function fetchProducts() {
-            if (initialLoad) setLoading(true);
-
             try {
                 const params = new URLSearchParams({
                     page: page.toString(),
                     page_size: pageSize.toString(),
                 });
-
                 if (category && category.toLowerCase() !== "all") {
                     params.append("new_category", category);
                 }
@@ -56,42 +51,20 @@ const LatestProductsWrapper: React.FC<LatestProductsWrapperProps> = ({
                 if (priceRange[1] < 999999) params.append("max_price", priceRange[1].toString());
                 if (sortBy && sortBy !== "default") params.append("ordering", sortBy);
 
-                const res = await fetch(`${endpoint}?${params.toString()}`);
-                if (!res.ok) throw new Error("Failed to fetch products");
-
+                const res = await fetchWithLoading(() => fetch(`${endpoint}?${params}`));
+                if (!res.ok) throw new Error('Failed to fetch products');
                 const data: PaginatedResponse = await res.json();
-
-                const mapped: Product[] = data.results.map(p => ({
-                    id: p.id,
-                    name: p.name ?? "—",
-                    category_name: p.category_name ?? "uncategorized",  // ← matches interface
-                    category_slug: p.category_slug ?? "uncategorized",  // ← matches interface
-                    category: p.category_name ?? "uncategorized",       // ← optional display field
-                    price: p.price ?? 0,
-                    stars: p.stars ?? null,
-                    stock_status: p.stock_status ?? false,
-                    image_url: p.image_url ?? "/placeholder.png",
-                    slug: p.slug ?? "",
-                    warranty: p.warranty ?? 0,
-                    delivery_days: p.delivery_days ?? 0,
-                    return_days: p.return_days ?? 0,
-                }));
-
-                if (isMounted) {
-                    setProducts(mapped);
+                if (mounted) {
+                    setProducts(data.results);
                     setTotalCount(data.count);
-                    setInitialLoad(false);
                 }
             } catch (err) {
                 console.error(err);
-            } finally {
-                if (isMounted) setLoading(false);
             }
         }
-
         fetchProducts();
-        return () => { isMounted = false; };
-    }, [endpoint, page, pageSize, category, priceRange, sortBy, initialLoad]);
+        return () => { mounted = false; };
+    }, [endpoint, page, pageSize, category, priceRange, sortBy, fetchWithLoading]);
 
     const totalPages = Math.ceil(totalCount / pageSize);
 
@@ -100,7 +73,6 @@ const LatestProductsWrapper: React.FC<LatestProductsWrapperProps> = ({
         setPage(newPage);
     };
 
-    if (loading && initialLoad) return null;
     if (products.length === 0) return <p className="text-center py-12">No products available.</p>;
 
     if (children) {

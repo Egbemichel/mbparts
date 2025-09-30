@@ -1,4 +1,3 @@
-import { LoadingProvider } from "@/components/LoadingContext";
 import ServerLayout from "./server-layout";
 import ClientLayout from "./client-layout";
 import "./globals.css";
@@ -47,11 +46,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html lang="en">
         <body className="antialiased min-h-screen flex flex-col">
-        <LoadingProvider>
             <ServerLayout>
                 <ClientLayout>{children}</ClientLayout>
             </ServerLayout>
-        </LoadingProvider>
         </body>
         </html>
     );

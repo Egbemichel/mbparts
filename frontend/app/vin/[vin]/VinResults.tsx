@@ -26,11 +26,13 @@ export default function VinResults({ vehicleInfo }: { vehicleInfo: VehicleInfo }
     const fetchFitment = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await fetchWithLoading(`${BASE_URL}/parts/fitment/`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(vehicleInfo),
-            });
+            const res = await fetchWithLoading(() =>
+                fetch(`${BASE_URL}/parts/fitment/`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(vehicleInfo),
+                })
+            );
 
             if (!res.ok) throw new Error("Failed to fetch fitment data");
             const data = await res.json();
@@ -49,9 +51,11 @@ export default function VinResults({ vehicleInfo }: { vehicleInfo: VehicleInfo }
     async function fetchPage(category: string, pageNumber: number) {
         try {
             const paramName = `page_${category.toLowerCase().replace(/\s+/g, "_")}`;
-            const res = await fetchWithLoading(`${BASE_URL}/parts/fitment/?${paramName}=${pageNumber}`, {
-                method: "GET",
-            });
+            const res = await fetchWithLoading(() =>
+                fetch(`${BASE_URL}/parts/fitment/?${paramName}=${pageNumber}`, {
+                    method: "GET",
+                })
+            );
 
             if (!res.ok) throw new Error("Failed to fetch page");
             const data = await res.json();

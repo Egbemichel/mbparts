@@ -50,7 +50,7 @@ const AccessoriesClient: React.FC<AccessoriesClientProps> = ({ categorySlug, cat
                 if (priceRange[0] > 0) params.append("min_price", priceRange[0].toString());
                 if (priceRange[1] < 10000) params.append("max_price", priceRange[1].toString());
 
-                const res = await fetchWithLoading(`${endpoint}?${params.toString()}`);
+                const res = await fetchWithLoading(() => fetch(`${endpoint}?${params.toString()}`));
                 if (!res.ok) throw new Error("Failed to fetch products");
 
                 const data: PaginatedResponse = await res.json();

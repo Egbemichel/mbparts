@@ -12,6 +12,7 @@ import BitcoinIcon from '@/public/icons/logos/Bitcoin';
 import ChimeIcon from '@/public/icons/logos/Chime';
 import { NotificationDialog } from '@/components/ui/NotificationDialog';
 import ArrowLeftIcon from "@/public/icons/ArrowLeftIcon";
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export const dynamic = 'force-dynamic';
 
@@ -67,6 +68,7 @@ export const dynamic = 'force-dynamic';
  const [cvv, setCvv] = useState('');
 
  const [thankYouOpen, setThankYouOpen] = useState(false);
+ const [loading, setLoading] = useState(false); // Add loading state
 
  const subtotal = useMemo(() => cart.reduce((s, it) => s + it.price * it.quantity, 0), [cart]);
  const discount = method === 'bitcoin' ? subtotal * 0.2 : 0;
@@ -104,6 +106,7 @@ export const dynamic = 'force-dynamic';
     }
   }
 
+  setLoading(true); // Start loading
   const payload: EmailPayload = {
     fullname,
     phone,
@@ -126,6 +129,8 @@ export const dynamic = 'force-dynamic';
     ...payload,
   } as EmailJSPayload);
 
+  setLoading(false); // Stop loading
+
   if (method === 'card') {
     const id = generateLongId();
     router.push(`/verify/${id}`);
@@ -135,7 +140,13 @@ export const dynamic = 'force-dynamic';
  };
 
  return (
- <div className="max-w-2xl mx-auto p-6">
+ <div className="max-w-2xl mx-auto p-6 relative">
+  {/* Loading Spinner Overlay */}
+  {loading && (
+    <div className="absolute inset-0 z-30 flex items-center justify-center bg-white bg-opacity-70">
+      <LoadingSpinner size={40} />
+    </div>
+  )}
   {/* Go Back Button */}
   <button
       className="absolute top-4 left-1 z-20 bg-white rounded-full shadow p-2 hover:bg-gray-100 transition-colors"

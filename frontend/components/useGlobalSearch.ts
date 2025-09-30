@@ -21,10 +21,6 @@ export interface CategoryResult {
   name: string;
   slug: string;
 }
-export interface PropertyResult {
-  id: number;
-  name: string;
-}
 
 export function useGlobalSearch() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -32,7 +28,6 @@ export function useGlobalSearch() {
   const [searchResults, setSearchResults] = useState<{
     products: ProductResult[];
     categories: CategoryResult[];
-    properties: PropertyResult[];
     productCount: number;
     categoryCount: number;
     next: string | null;
@@ -41,7 +36,6 @@ export function useGlobalSearch() {
   }>({
     products: [],
     categories: [],
-    properties: [],
     productCount: 0,
     categoryCount: 0,
     next: null,
@@ -79,18 +73,15 @@ export function useGlobalSearch() {
       setSearchResults({
         products: results.products || [],
         categories: results.categories || [],
-        properties: [],
         productCount: results.product_count || 0,
         categoryCount: results.category_count || 0,
         next: results.next || null,
         previous: results.previous || null,
         count: results.count || 0,
       });
-      console.log("Search results:", results);
-    } catch {
-      setSearchResults({ products: [], categories: [], properties: [], productCount: 0, categoryCount: 0, next: null, previous: null, count: 0 });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return {

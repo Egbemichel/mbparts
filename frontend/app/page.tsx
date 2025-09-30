@@ -1,3 +1,4 @@
+"use client";
 import NavbarHome from "@/components/NavbarHome";
 import React from "react";
 import {HeroBanner} from "@/components/HeroBanner";
@@ -14,9 +15,8 @@ import LatestProductWrapper from "@/components/LatestProductWrapper";
 //import Services from "@/components/Services";
 import PaymentCarousel from "@/components/PaymentCarrousel";
 import PopularAccessories from "@/components/PopularAccessories";
+
 export const dynamic = 'force-dynamic';
-
-
 
 export default function Home() {
   return (

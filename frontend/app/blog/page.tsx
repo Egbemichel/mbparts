@@ -4,7 +4,6 @@ import { Calendar, User, Tag, ArrowRight, Search, Facebook, Twitter, Linkedin, S
 import ArrowLeftIcon from "@/public/icons/ArrowLeftIcon";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { LoadingProvider } from "@/components/LoadingContext";
 
 // Types
 interface BlogPost {
@@ -455,8 +454,6 @@ const BlogPage: React.FC = () => {
 
 export default function BlogPageWrapper() {
   return (
-    <LoadingProvider>
-      <BlogPage />
-    </LoadingProvider>
+    <BlogPage />
   );
 }

@@ -13,8 +13,8 @@ import DoubleArrowRight from "@/public/icons/DoubleArrowRight";
 import { useCart } from '@/components/CartContext';
 import { useWishlist } from '@/components/WishlistContext';
 import Image from 'next/image';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { useGlobalSearch, ProductResult, CategoryResult } from "@/components/useGlobalSearch";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 
 interface HeaderProps {
@@ -67,7 +67,7 @@ const Header: React.FC<HeaderProps> = ({
     useEffect(() => {
         if (!showSearchOverlay) return;
         function handleClick(e: MouseEvent) {
-            if (overlayRef.current && (overlayRef.current as HTMLElement).contains(e.target as Node) === false) {
+            if (overlayRef.current && !(overlayRef.current as HTMLElement).contains(e.target as Node)) {
                 setShowSearchOverlay(false);
             }
         }
@@ -77,17 +77,25 @@ const Header: React.FC<HeaderProps> = ({
 
     // ✅ Fetch categories from backend
     useEffect(() => {
+        const abortController = new AbortController();
         const fetchCategories = async () => {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/parts/categories/`);
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/parts/categories/`, {
+                    signal: abortController.signal
+                });
                 if (!res.ok) throw new Error("Failed to load categories");
                 const data = await res.json();
-                setCategories(data.results || []); // ✅ only array
+                setCategories(data.results || []);
             } catch (err) {
-                console.error("Error fetching categories:", err);
+                if (err instanceof Error && err.name !== 'AbortError') {
+                    console.error("Error fetching categories in NavbarHome:", err);
+                }
             }
         };
         fetchCategories();
+        return () => {
+            abortController.abort();
+        };
     }, []);
 
     // ✅ Filter parts and accessories from backend
@@ -516,7 +524,7 @@ const Header: React.FC<HeaderProps> = ({
                     )}
                 </div>
 
-                <SecondaryNav/>
+                <SecondaryNav categories={categories} />
             </header>
 
             {/* Mobile Sidebar Navigation */}
@@ -525,9 +533,9 @@ const Header: React.FC<HeaderProps> = ({
             {/* Search Overlay */}
             {showSearchOverlay && (
                 <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 " style={{ transition: 'opacity 0.3s' }}>
-                    <div ref={overlayRef} className="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-auto p-6 relative animate-slideInLeft">
+                    <div ref={overlayRef} className="bg-white shadow-lg w-full max-w-2xl mx-auto p-6 relative animate-slideInLeft">
                         {/* Pixel-perfect search bar at the top of the overlay */}
-                        <form onSubmit={(e) => handleSearchOverlay(e)} className="relative mb-6">
+                        <form onSubmit={(e) => handleSearchOverlay(e)} className="relative mb-6 border rounded-full ">
                           <input
                             type="text"
                             value={searchQuery}
@@ -538,14 +546,14 @@ const Header: React.FC<HeaderProps> = ({
                           />
                           <button
                             type="submit"
-                            className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-md text-black hover:bg-accent-50 transition-colors"
+                            className="absolute right-0.5 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:bg-gray-700 bg-accent-50 rounded-full transition-colors"
                             aria-label="Search"
                           >
                             <SearchIcon/>
                           </button>
                         </form>
                         <button
-                            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                            className="absolute top-1 right-2 text-gray-500 hover:text-gray-700"
                             onClick={() => setShowSearchOverlay(false)}
                             aria-label="Close search overlay"
                         >
@@ -554,13 +562,12 @@ const Header: React.FC<HeaderProps> = ({
                             </svg>
                         </button>
                         <div className="flex gap-4 mb-4">
-                            <button className={`px-4 py-2 rounded font-semibold ${activeTab === 'products' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700'}`} onClick={() => setActiveTab('products')}>Products</button>
-                            <button className={`px-4 py-2 rounded font-semibold ${activeTab === 'categories' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700'}`} onClick={() => setActiveTab('categories')}>Categories</button>
-                            <button className={`px-4 py-2 rounded font-semibold ${activeTab === 'properties' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700'}`} onClick={() => setActiveTab('properties')}>Properties</button>
+                            <button className={`px-4 py-2 font-semibold ${activeTab === 'products' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700'}`} onClick={() => setActiveTab('products')}>Products</button>
+                            <button className={`px-4 py-2 font-semibold ${activeTab === 'categories' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700'}`} onClick={() => setActiveTab('categories')}>Categories</button>
                         </div>
                         <div className="min-h-[200px] flex flex-col items-center justify-center">
                             {isLoading ? (
-                                <LoadingSpinner size={40} />
+                                <div><LoadingSpinner /></div>
                             ) : !hasSearched ? (
                                 <Image src="/images/rafiki.svg" alt="Empty search" width={260} height={260} className="mb-4" />
                             ) : (
@@ -622,9 +629,6 @@ const Header: React.FC<HeaderProps> = ({
                                           )}
                                         </div>
                                       </>
-                                    )}
-                                    {activeTab === 'properties' && (
-                                        <div className="text-gray-500">No property search implemented.</div>
                                     )}
                                 </>
                             )}
