@@ -15,6 +15,8 @@ import { useWishlist } from '@/components/WishlistContext';
 import Image from 'next/image';
 import { useGlobalSearch, ProductResult, CategoryResult } from "@/components/useGlobalSearch";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import ArrowLeftIcon from '@/public/icons/ArrowLeftIcon';
+import ArrowRightIcon from '@/public/icons/ArrowRightIcon';
 
 
 interface HeaderProps {
@@ -644,13 +646,17 @@ const Header: React.FC<HeaderProps> = ({
                                             )}
                                         </div>
                                     )}
-                                    {/* Pagination controls always visible at bottom */}
-                                    <div className="flex justify-between mt-4 w-full">
+                                    {/* Pagination controls always visible at the bottom */}
+                                    <div className="flex justify-between mt-4 w-full overflow-x-auto flex-nowrap scrollbar-hide gap-2">
                                         {searchResults.previous && (
-                                            <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleSearchOverlay(undefined, searchResults.previous!)} disabled={isLoading}>Previous</button>
+                                            <button className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center justify-center" onClick={() => handleSearchOverlay(undefined, searchResults.previous!)} disabled={isLoading} aria-label="Previous page">
+                                                <ArrowLeftIcon className="w-5 h-5" />
+                                            </button>
                                         )}
                                         {searchResults.next && (
-                                            <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 ml-auto" onClick={() => handleSearchOverlay(undefined, searchResults.next!)} disabled={isLoading}>Next</button>
+                                            <button className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center justify-center ml-auto" onClick={() => handleSearchOverlay(undefined, searchResults.next!)} disabled={isLoading} aria-label="Next page">
+                                                <ArrowRightIcon className="w-5 h-5" />
+                                            </button>
                                         )}
                                     </div>
                                 </>

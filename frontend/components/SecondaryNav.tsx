@@ -8,6 +8,8 @@ import { useGlobalSearch, ProductResult, CategoryResult } from "@/components/use
 import SearchIcon from "@/public/icons/SearchIcon";
 import Image from "next/image";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import ArrowLeftIcon from '@/public/icons/ArrowLeftIcon';
+import ArrowRightIcon from '@/public/icons/ArrowRightIcon';
 
 interface Category {
     id: number;
@@ -247,9 +249,6 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
             {/* Mobile VIN Identification Section */}
             <div className="md:hidden bg-white px-4 py-4">
                 <div className="max-w-md mx-auto">
-                    <h1 className="flex items-center justify-center p-6 text-secondary-100 text-[30px]">
-                        Mercedes-Benz OEM Parts and Accessories
-                    </h1>
                     {/* Mobile Search Bar */}
                     <form onSubmit={(e) => { handleSearchOverlay(e); }} className="relative mb-6">
                         <input
@@ -378,12 +377,16 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
                                         )}
                                     </div>
                                     {/* Pagination controls always visible at bottom */}
-                                    <div className="flex justify-between mt-4 w-full">
+                                    <div className="flex justify-between mt-4 w-full overflow-x-auto flex-nowrap scrollbar-hide gap-2">
                                         {searchResults.previous && (
-                                            <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleSearchOverlay(undefined, searchResults.previous!)} disabled={isLoading}>Previous</button>
+                                            <button className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center justify-center" onClick={() => handleSearchOverlay(undefined, searchResults.previous!)} disabled={isLoading} aria-label="Previous page">
+                                                <ArrowLeftIcon className="w-5 h-5" />
+                                            </button>
                                         )}
                                         {searchResults.next && (
-                                            <button className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 ml-auto" onClick={() => handleSearchOverlay(undefined, searchResults.next!)} disabled={isLoading}>Next</button>
+                                            <button className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center justify-center ml-auto" onClick={() => handleSearchOverlay(undefined, searchResults.next!)} disabled={isLoading} aria-label="Next page">
+                                                <ArrowRightIcon className="w-5 h-5" />
+                                            </button>
                                         )}
                                     </div>
                                 </div>

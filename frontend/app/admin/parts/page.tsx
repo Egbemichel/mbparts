@@ -8,6 +8,8 @@ import Modal from "react-modal";
 import Image from "next/image";
 import { NormalizedPart, ProductImage } from "@/lib/types";
 import { deleteFromCloudinary, getPublicIdFromUrl, uploadToCloudinary } from "@/lib/cloudinary";
+import ArrowLeftIcon from '@/public/icons/ArrowLeftIcon';
+import ArrowRightIcon from '@/public/icons/ArrowRightIcon';
 
 /**
  * Note: this file expects the backend parts endpoints to:
@@ -536,25 +538,61 @@ export default function PartsAdminPage() {
                         </div>
                         {/* Pagination Controls */}
                         <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-2 w-full">
-                            <button
-                                disabled={page <= 1}
-                                onClick={() => setPage(p => Math.max(1, p - 1))}
-                                className={`px-3 py-1 rounded ${page <= 1 ? "bg-gray-300 cursor-not-allowed" : "bg-blue-600 text-white"}`}
-                            >
-                                Previous
-                            </button>
-
+                            <div className="flex items-center gap-2 overflow-x-auto flex-nowrap scrollbar-hide">
+                                <button
+                                    disabled={page <= 1}
+                                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                                    className={`px-2 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50 flex items-center justify-center`}
+                                    aria-label="Previous page"
+                                >
+                                    <ArrowLeftIcon className="w-5 h-5" />
+                                </button>
+                                {(() => {
+                                    const totalPages = Math.ceil(count / 10) || 1;
+                                    const delta = 1;
+                                    const range = [];
+                                    const rangeWithDots = [];
+                                    let l;
+                                    for (let i = 1; i <= totalPages; i++) {
+                                        if (i === 1 || i === totalPages || (i >= page - delta && i <= page + delta)) {
+                                            range.push(i);
+                                        }
+                                    }
+                                    for (let i of range) {
+                                        if (l) {
+                                            if (i - l === 2) {
+                                                rangeWithDots.push(l + 1);
+                                            } else if (i - l > 2) {
+                                                rangeWithDots.push('...');
+                                            }
+                                        }
+                                        rangeWithDots.push(i);
+                                        l = i;
+                                    }
+                                    return rangeWithDots.map((p, idx) =>
+                                        p === '...'
+                                            ? <span key={idx} className="px-2 text-gray-400">...</span>
+                                            : <button
+                                                key={p}
+                                                onClick={() => setPage(Number(p))}
+                                                className={`px-3 py-1 rounded ${page === p ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
+                                            >
+                                                {p}
+                                            </button>
+                                    );
+                                })()}
+                                <button
+                                    disabled={page >= Math.ceil(count / 10)}
+                                    onClick={() => setPage(p => p + 1)}
+                                    className={`px-2 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50 flex items-center justify-center`}
+                                    aria-label="Next page"
+                                >
+                                    <ArrowRightIcon className="w-5 h-5" />
+                                </button>
+                            </div>
                             <span className="text-sm">
                                Page {page} of {Math.ceil(count / 10) || 1}
                             </span>
-
-                            <button
-                                disabled={page >= Math.ceil(count / 10)}
-                                onClick={() => setPage(p => p + 1)}
-                                className={`px-3 py-1 rounded ${page >= Math.ceil(count / 10) ? "bg-gray-300 cursor-not-allowed" : "bg-blue-600 text-white"}`}
-                            >
-                                Next
-                            </button>
                         </div>
                     </div>
 

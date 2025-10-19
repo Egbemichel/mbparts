@@ -6,6 +6,8 @@ import { Product } from "@/lib/types";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/components/CartContext";
 import { useFetchWithLoading } from "@/lib/fetchWithLoading";
+import ArrowLeftIcon from '@/public/icons/ArrowLeftIcon';
+import ArrowRightIcon from '@/public/icons/ArrowRightIcon';
 
 interface AccessoriesClientProps {
     categorySlug: string;
@@ -164,29 +166,55 @@ const AccessoriesClient: React.FC<AccessoriesClientProps> = ({ categorySlug, cat
                     ))}
 
                     {/* Pagination */}
-                    <div className="flex justify-center items-center gap-2 mt-8">
+                    <div className="flex justify-center items-center gap-2 mt-8 overflow-x-auto flex-nowrap scrollbar-hide">
                         <button
                             onClick={() => handlePageChange(page - 1)}
                             disabled={page === 1}
-                            className="px-3 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50"
+                            className="px-2 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50 flex items-center justify-center"
+                            aria-label="Previous page"
                         >
-                            Previous
+                            <ArrowLeftIcon className="w-5 h-5" />
                         </button>
-                        {Array.from({ length: totalPages }).map((_, i) => (
-                            <button
-                                key={i + 1}
-                                onClick={() => handlePageChange(i + 1)}
-                                className={`px-3 py-1 rounded ${page === i + 1 ? 'bg-orange-600 text-white' : 'bg-gray-100 text-gray-700'}`}
-                            >
-                                {i + 1}
-                            </button>
-                        ))}
+                        {(() => {
+                            const delta = 1;
+                            const range = [];
+                            const rangeWithDots = [];
+                            let l;
+                            for (let i = 1; i <= totalPages; i++) {
+                                if (i === 1 || i === totalPages || (i >= page - delta && i <= page + delta)) {
+                                    range.push(i);
+                                }
+                            }
+                            for (let i of range) {
+                                if (l) {
+                                    if (i - l === 2) {
+                                        rangeWithDots.push(l + 1);
+                                    } else if (i - l > 2) {
+                                        rangeWithDots.push('...');
+                                    }
+                                }
+                                rangeWithDots.push(i);
+                                l = i;
+                            }
+                            return rangeWithDots.map((p, idx) =>
+                                p === '...'
+                                    ? <span key={idx} className="px-2 text-gray-400">...</span>
+                                    : <button
+                                        key={p}
+                                        onClick={() => handlePageChange(Number(p))}
+                                        className={`px-3 py-1 rounded ${page === p ? 'bg-orange-600 text-white' : 'bg-gray-100 text-gray-700'}`}
+                                    >
+                                        {p}
+                                    </button>
+                            );
+                        })()}
                         <button
                             onClick={() => handlePageChange(page + 1)}
                             disabled={page === totalPages}
-                            className="px-3 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50"
+                            className="px-2 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50 flex items-center justify-center"
+                            aria-label="Next page"
                         >
-                            Next
+                            <ArrowRightIcon className="w-5 h-5" />
                         </button>
                     </div>
                 </div>

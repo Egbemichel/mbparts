@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import FlexibleBanner, { BannerCard, PromoBanner } from "@/components/Hero";
@@ -22,7 +22,8 @@ export const HeroBanner: React.FC = () => {
             description: "Led sequential headlights",
             ctaText: "SHOP NOW",
             ctaLink: "/shop",
-            backgroundImage: "/images/hero.jpg"
+            backgroundImage: "/images/hero.jpg",
+            alt: "Mercedes Benz parts - headlights"
         },
         {
             id: "hero-2",
@@ -32,7 +33,8 @@ export const HeroBanner: React.FC = () => {
             description: "Premium brake kits",
             ctaText: "SHOP NOW",
             ctaLink: "/shop",
-            backgroundImage: "/images/car-brake-disc.png"
+            backgroundImage: "/images/car-brake-disc.png",
+            alt: "Mercedes Benz brake parts"
         },
         {
             id: "hero-3",
@@ -42,7 +44,8 @@ export const HeroBanner: React.FC = () => {
             description: "Luxury seat covers",
             ctaText: "SHOP NOW",
             ctaLink: "/shop",
-            backgroundImage: "/images/car-seat.jpg"
+            backgroundImage: "/images/car-seat.jpg",
+            alt: "Mercedes Benz interior parts"
         }
     ];
 
@@ -74,7 +77,7 @@ export const HeroBanner: React.FC = () => {
         setCurrent(idx);
     };
 
-    // Animation variants for sliding
+    // Animation variants
     const variants = {
         enter: (dir: number) => ({
             x: dir > 0 ? 300 : -300,
@@ -94,9 +97,21 @@ export const HeroBanner: React.FC = () => {
     };
 
     return (
-        <div className="w-full max-w-full px-2 sm:px-4 md:px-8 lg:px-0 mx-auto">
+        <section
+            className="w-full max-w-full px-2 sm:px-4 md:px-8 lg:px-0 mx-auto relative"
+            aria-label="Mercedes Benz Parts Hero Banner"
+        >
+            {/* Main H1 for SEO */}
+            <header className="text-center py-6">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold">
+                    Mercedes Benz Parts – OEM & Quality Accessories
+                </h1>
+                <h2 className="text-lg md:text-xl text-gray-600 mt-2">
+                    Shop Genuine Mercedes Benz Parts, OEM Components & Accessories
+                </h2>
+            </header>
+
             <div className="relative overflow-hidden">
-                {/* Animated slide transition */}
                 <AnimatePresence custom={direction} initial={false}>
                     <motion.div
                         key={banners[current].id}
@@ -105,10 +120,15 @@ export const HeroBanner: React.FC = () => {
                         initial="enter"
                         animate="center"
                         exit="exit"
-                        transition={{ x: { type: "spring", stiffness: 200, damping: 20 }, opacity: { duration: 0.2 } }}
+                        transition={{
+                            x: { type: "spring", stiffness: 200, damping: 20 },
+                            opacity: { duration: 0.2 }
+                        }}
                         className="w-full h-full absolute left-0 top-0"
                         onAnimationStart={() => setIsAnimating(true)}
                         onAnimationComplete={() => setIsAnimating(false)}
+                        role="img"
+                        aria-label={banners[current].alt}
                     >
                         <FlexibleBanner
                             layout="hero"
@@ -117,7 +137,8 @@ export const HeroBanner: React.FC = () => {
                         />
                     </motion.div>
                 </AnimatePresence>
-                {/* Circle indicators */}
+
+                {/* Indicators */}
                 <div className="absolute left-0 right-0 bottom-4 flex justify-center items-center gap-3 z-20">
                     {banners.map((_, idx) => (
                         <button
@@ -132,6 +153,6 @@ export const HeroBanner: React.FC = () => {
                     ))}
                 </div>
             </div>
-        </div>
+        </section>
     );
 };

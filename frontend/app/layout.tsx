@@ -3,39 +3,41 @@ import ClientLayout from "./client-layout";
 import "./globals.css";
 
 export const metadata = {
-    title: "MB Parts Assembly – Quality Auto Parts for Mercedes-Benz",
+    title: "Mercedes Benz Parts | OEM & Accessories | MB Parts Assembly",
     description:
-        "Find high-quality, genuine, and affordable auto parts for Mercedes-Benz vehicles. Shop engine parts, body parts, and accessories with fast delivery and warranty included.",
+        "Shop genuine Mercedes Benz parts, OEM components, and accessories at MB Parts Assembly. Fast shipping, VIN compatibility checks, and guaranteed quality.",
     metadataBase: new URL("https://mbpartsassembly.com"),
     icons: {
         icon: "/mbparts_logo.ico",          // main favicon
         shortcut: "/mbparts_logo.ico",      // shortcut icon
-        apple: "/mbparts_logo.png",   // optional for Apple devices
+        apple: "/mbparts_logo.png",         // Apple touch icon
     },
     openGraph: {
         type: "website",
         url: "https://mbpartsassembly.com",
-        title: "MB Parts Assembly – Quality Auto Parts for Mercedes-Benz",
+        title: "Mercedes Benz Parts | OEM & Accessories | MB Parts Assembly",
         description:
-            "Shop trusted Mercedes-Benz parts with warranty and quick delivery. MB Parts Assembly is your reliable source for premium car parts online.",
+            "Shop genuine Mercedes Benz parts, OEM components, and accessories at MB Parts Assembly. Fast shipping, VIN compatibility checks, and guaranteed quality.",
         images: [
             {
                 url: "https://raw.githubusercontent.com/Egbemichel/images/refs/heads/main/mbparts_logo.png",
                 width: 1200,
                 height: 630,
-                alt: "MB Parts Assembly – Mercedes-Benz Parts Store",
+                alt: "MB Parts Assembly – Mercedes Benz Parts Store",
             },
         ],
     },
     twitter: {
         card: "summary_large_image",
-        title: "MB Parts Assembly – Quality Auto Parts for Mercedes-Benz",
+        title: "Mercedes Benz Parts – MB Parts Assembly",
         description:
-            "Explore genuine Mercedes-Benz auto parts and accessories at affordable prices with fast delivery.",
-        images: ["https://raw.githubusercontent.com/Egbemichel/images/refs/heads/main/mbparts_logo.png"],
+            "Explore genuine Mercedes Benz parts, OEM components, and accessories at affordable prices with fast delivery.",
+        images: [
+            "https://raw.githubusercontent.com/Egbemichel/images/refs/heads/main/mbparts_logo.png",
+        ],
     },
     robots: { index: true, follow: true },
-    alternates: { canonical: "https://mbpartsassembly.com", },
+    alternates: { canonical: "https://mbpartsassembly.com" },
 };
 
 export const viewport = {
@@ -46,9 +48,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html lang="en">
         <body className="antialiased min-h-screen flex flex-col">
-            <ServerLayout>
-                <ClientLayout>{children}</ClientLayout>
-            </ServerLayout>
+        <ServerLayout>
+            <ClientLayout>{children}</ClientLayout>
+        </ServerLayout>
         </body>
         </html>
     );

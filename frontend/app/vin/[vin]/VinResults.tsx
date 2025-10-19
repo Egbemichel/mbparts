@@ -12,6 +12,8 @@ import ViewIcon from "@/public/icons/ViewIcon";
 import Star from "@/public/icons/StarIcon";
 import Check from "@/public/icons/Check";
 import Image from "next/image";
+import ArrowLeftIcon from "@/public/icons/ArrowLeftIcon";
+import ArrowRightIcon from "@/public/icons/ArrowRightIcon";
 
 export default function VinResults({ vehicleInfo }: { vehicleInfo: VehicleInfo }) {
     const [fitment, setFitment] = useState<Record<string, PaginatedParts>>({});
@@ -219,16 +221,17 @@ export default function VinResults({ vehicleInfo }: { vehicleInfo: VehicleInfo }
                         </div>
 
                         {/* Pagination */}
-                        <div className="flex justify-between mt-6">
+                        <div className="flex justify-between mt-6 overflow-x-auto flex-nowrap scrollbar-hide gap-2">
                             {parts.previous && (
                                 <button
                                     onClick={() => {
                                         const pageStr = parts.previous?.split("page_")[1]?.split("=")[1];
                                         if (pageStr) fetchPage(category, parseInt(pageStr, 10));
                                     }}
-                                    className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                                    className="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 flex items-center justify-center"
+                                    aria-label="Previous page"
                                 >
-                                    Previous
+                                    <ArrowLeftIcon className="w-5 h-5" />
                                 </button>
                             )}
                             {parts.next && (
@@ -237,9 +240,10 @@ export default function VinResults({ vehicleInfo }: { vehicleInfo: VehicleInfo }
                                         const pageStr = parts.next?.split("page_")[1]?.split("=")[1];
                                         if (pageStr) fetchPage(category, parseInt(pageStr, 10));
                                     }}
-                                    className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 ml-auto"
+                                    className="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 flex items-center justify-center ml-auto"
+                                    aria-label="Next page"
                                 >
-                                    Next
+                                    <ArrowRightIcon className="w-5 h-5" />
                                 </button>
                             )}
                         </div>
