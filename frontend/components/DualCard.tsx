@@ -13,7 +13,8 @@ export const DualCardsBanner: React.FC = () => {
             subtitle: "YOUR RIDE",
             ctaText: "SHOP NOW",
             ctaLink: "/shop",
-            backgroundImage: "/images/car-seat.jpg"
+            backgroundImage: "/images/car-seat.jpg",
+            alt: "Car seat sale banner image"
         },
         {
             id: "card-2",
@@ -22,7 +23,8 @@ export const DualCardsBanner: React.FC = () => {
             subtitle: "DRIVING",
             ctaText: "SHOP NOW",
             ctaLink: "/shop",
-            backgroundImage: "/images/car-brake-disc.png"
+            backgroundImage: "/images/car-brake-disc.png",
+            alt: "Brake system banner image"
         }
     ];
 
