@@ -161,7 +161,7 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
             searchResults.previous = null;
             searchResults.count = 0;
         }
-    }, [setShowSearchOverlay, setSearchQuery, setActiveTab, searchResults]);
+    }, [setShowSearchOverlay, setSearchQuery, setActiveTab, setHasSearched, searchResults]);
 
     return (
         <div ref={navRef} className="relative">

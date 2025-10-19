@@ -112,7 +112,6 @@ const ShopPage: React.FC = () => {
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
     const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
     const router = useRouter();
     const fetchWithLoading = useFetchWithLoading();
 
@@ -125,7 +124,6 @@ const ShopPage: React.FC = () => {
                 return;
             }
             try {
-                setLoading(true);
                 const res = await fetchWithLoading(() => fetch(`${apiUrl}/parts/categories/`));
                 if (!res.ok) throw new Error('Failed to fetch categories');
                 const data = await res.json();
@@ -138,8 +136,6 @@ const ShopPage: React.FC = () => {
                 setCategories(categoriesArray);
             } catch (err) {
                 setError((err as Error).message || 'Failed to load categories');
-            } finally {
-                setLoading(false);
             }
         };
         fetchCategories();

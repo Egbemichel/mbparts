@@ -78,7 +78,7 @@ const Header: React.FC<HeaderProps> = ({
         }
         document.addEventListener('mousedown', handleClick);
         return () => document.removeEventListener('mousedown', handleClick);
-    }, [showSearchOverlay, overlayRef, setShowSearchOverlay]);
+    }, [showSearchOverlay, overlayRef, setShowSearchOverlay, setHasSearched]);
 
 
     // ✅ Fetch categories from backend
