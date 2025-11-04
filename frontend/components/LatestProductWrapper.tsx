@@ -54,7 +54,14 @@ const LatestProductsWrapper: React.FC<LatestProductsWrapperProps> = ({
                 if (sortBy && sortBy !== "default") params.append("ordering", sortBy);
 
                 const res = await fetchWithLoading(() => fetch(`${endpoint}?${params}`));
-                if (!res.ok) throw new Error('Failed to fetch products');
+                if (!res.ok) {
+                    console.error('Failed to fetch products', res.status);
+                    if (mounted) {
+                        setProducts([]);
+                        setTotalCount(0);
+                    }
+                    return;
+                }
                 const data: PaginatedResponse = await res.json();
                 if (mounted) {
                     setProducts(data.results);
@@ -77,7 +84,7 @@ const LatestProductsWrapper: React.FC<LatestProductsWrapperProps> = ({
 
     // Helper to generate pagination range with ellipsis
     const getPaginationRange = (): (number | '...')[] => {
-        const DOTS: '...' = '...';
+        const DOTS = '...' as const;
         const siblingCount = 1; // number of pages to show around current
         const total = totalPages;
 
