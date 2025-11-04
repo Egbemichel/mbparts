@@ -58,14 +58,15 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
         setShowSearchOverlay,
     } = useGlobalSearch();
 
-    // When the mobile overlay opens, fetch a larger page so the scrollable overlay can show more items.
+    // Prevent background scrolling while overlay is open and restore on close
     React.useEffect(() => {
-        if (showSearchOverlay && !hasSearched) {
-            // Auto-load all search results into the overlay so the scrollable area shows everything.
-            // This follows next links or requests a large page size; may make multiple requests.
-            loadAllSearchResults();
+        if (showSearchOverlay) {
+            const previous = document.body.style.overflow;
+            document.body.style.overflow = 'hidden';
+            return () => { document.body.style.overflow = previous; };
         }
-    }, [showSearchOverlay, hasSearched, loadAllSearchResults]);
+        return;
+    }, [showSearchOverlay]);
 
     // Build dropdown items from categories
     const partsParent = categories.find((cat) => cat.slug === "parts");
@@ -304,7 +305,7 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
                     </div>
                     {/* Search Overlay for mobile */}
                     {showSearchOverlay && (
-                        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 " style={{ transition: 'opacity 0.3s' }}>
+                        <div className="fixed inset-0 z-[9999] flex items-start justify-center overflow-y-auto bg-black/70 py-8" style={{ transition: 'opacity 0.3s' }}>
                             <div ref={overlayRef} className="bg-white shadow-lg w-full max-w-2xl mx-auto p-6 relative animate-slideInLeft">
                                 <form onSubmit={(e) => handleSearchOverlay(e)} className="relative mb-6 border rounded-full ">
                                     <input
@@ -404,6 +405,18 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
                                             </button>
                                         )}
 
+                                        {/* If API provided a total count greater than currently loaded items, offer a Load all button */}
+                                        {searchResults.count > (searchResults.products || []).length && (
+                                            <button
+                                                className="px-4 py-2 bg-primary-50 text-white rounded hover:bg-primary-100"
+                                                onClick={() => loadAllSearchResults()}
+                                                disabled={isLoading}
+                                                aria-label="Load all results"
+                                            >
+                                                {isLoading ? 'Loading...' : 'Load all'}
+                                            </button>
+                                        )}
+
                                         {searchResults.next && (
                                             <button
                                                 className="px-4 py-2 bg-primary-50 text-white rounded hover:bg-primary-100"
@@ -414,11 +427,11 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
                                                 {isLoading ? 'Loading...' : 'Load more'}
                                             </button>
                                         )}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     )}
                 </div>
             </div>
         </div>
