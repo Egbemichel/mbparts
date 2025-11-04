@@ -282,7 +282,7 @@ const Header: React.FC<HeaderProps> = ({
                     aria-label="Sidebar navigation"
                 >
                     <div className="flex items-center justify-between px-6 py-4 border-b">
-                        <span className="font-bold text-lg text-primary-50">Menu</span>
+
                         <button
                             onClick={onClose}
                             aria-label="Close sidebar"
