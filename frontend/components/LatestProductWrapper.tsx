@@ -76,28 +76,47 @@ const LatestProductsWrapper: React.FC<LatestProductsWrapperProps> = ({
     };
 
     // Helper to generate pagination range with ellipsis
-    const getPaginationRange = () => {
-        const delta = 1; // how many neighbors to show
-        const range = [];
-        const rangeWithDots = [];
-        let l;
-        for (let i = 1; i <= totalPages; i++) {
-            if (i === 1 || i === totalPages || (i >= page - delta && i <= page + delta)) {
-                range.push(i);
-            }
+    const getPaginationRange = (): (number | '...')[] => {
+        const DOTS: '...' = '...';
+        const siblingCount = 1; // number of pages to show around current
+        const total = totalPages;
+
+        const range = (start: number, end: number) => {
+            const res: number[] = [];
+            for (let i = start; i <= end; i++) res.push(i);
+            return res;
+        };
+
+        if (total === 0) return [];
+
+        // total page numbers to show without dots
+        const totalPageNumbers = siblingCount * 2 + 5;
+
+        // If the number of pages is small, show all
+        if (total <= totalPageNumbers) {
+            return range(1, total);
         }
-        for (const i of range) {
-            if (l) {
-                if (i - l === 2) {
-                    rangeWithDots.push(l + 1);
-                } else if (i - l > 2) {
-                    rangeWithDots.push('...');
-                }
-            }
-            rangeWithDots.push(i);
-            l = i;
+
+        const leftSiblingIndex = Math.max(page - siblingCount, 1);
+        const rightSiblingIndex = Math.min(page + siblingCount, total);
+
+        const shouldShowLeftDots = leftSiblingIndex > 2;
+        const shouldShowRightDots = rightSiblingIndex < total - 1;
+
+        // Only right dots
+        if (!shouldShowLeftDots && shouldShowRightDots) {
+            const leftItemCount = 3 + 2 * siblingCount;
+            return [...range(1, leftItemCount), DOTS, total];
         }
-        return rangeWithDots;
+
+        // Only left dots
+        if (shouldShowLeftDots && !shouldShowRightDots) {
+            const rightItemCount = 3 + 2 * siblingCount;
+            return [1, DOTS, ...range(total - rightItemCount + 1, total)];
+        }
+
+        // Both sides dots
+        return [1, DOTS, ...range(leftSiblingIndex, rightSiblingIndex), DOTS, total];
     };
 
     const pagination = (
@@ -112,11 +131,11 @@ const LatestProductsWrapper: React.FC<LatestProductsWrapperProps> = ({
             </button>
             {getPaginationRange().map((p, idx) =>
                 p === '...'
-                    ? <span key={idx} className="px-2 text-gray-400">...</span>
+                    ? <span key={`ellipsis-${idx}`} className="px-2 text-gray-400">...</span>
                     : <button
-                        key={p}
+                        key={`page-${p}`}
                         onClick={() => handlePageChange(Number(p))}
-                        className={`px-3 py-1 rounded ${page === p ? 'bg-primary-50 text-white' : 'bg-gray-100 text-gray-700'}`}
+                        className={`px-3 py-1 rounded ${page === Number(p) ? 'bg-primary-50 text-white' : 'bg-gray-100 text-gray-700'}`}
                     >
                         {p}
                     </button>

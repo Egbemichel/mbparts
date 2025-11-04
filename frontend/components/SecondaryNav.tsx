@@ -99,6 +99,11 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
         },
     ];
 
+    // Preserve display format from env but create a cleaned tel: href using only digits
+    const rawPhone = phoneNumber || '';
+    const digitsOnly = rawPhone.replace(/[^\d]/g, '');
+    const telHref = digitsOnly ? `tel:${/^\s*\+/.test(rawPhone) ? '+' : ''}${digitsOnly}` : 'tel:';
+
     const handleMouseEnter = (label: string) => {
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
@@ -236,7 +241,7 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
                     <div className="flex items-center space-x-2 text-sm">
                         <span className="text-gray-300">Contact our product expert:</span>
                         <a
-                            href={`tel:${phoneNumber.replace(/[^\d]/g, "")}`}
+                            href={telHref}
                             className="text-primary-40 font-semibold hover:text-primary-30 transition-colors duration-200 flex items-center space-x-1"
                             aria-label={`Contact us at ${phoneNumber}`}
                         >

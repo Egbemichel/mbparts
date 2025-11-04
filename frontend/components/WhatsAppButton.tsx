@@ -5,7 +5,7 @@ import React from "react";
 import { usePathname } from "next/navigation";
 import { FaWhatsapp } from "react-icons/fa";
 
-const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_SHOP_PHONE; // replace with your WhatsApp number
+const WHATSAPP_NUMBER = "+12242248914"; // replace with your WhatsApp number
 
 const WhatsAppButton: React.FC = () => {
     const pathname = usePathname();
