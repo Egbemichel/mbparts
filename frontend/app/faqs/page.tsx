@@ -257,7 +257,7 @@ const ContactSection: React.FC = () => {
                         Contact Support
                     </button>
                     <button className="border border-gray-300 text-gray-700 px-8 py-3 rounded-md font-medium hover:bg-gray-50 transition-colors">
-                    Contact us: ${process.env.NEXT_PUBLIC_SHOP_PHONE}
+                    Contact us: {process.env.NEXT_PUBLIC_SHOP_PHONE}
                     </button>
                 </div>
 

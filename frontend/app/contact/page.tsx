@@ -238,7 +238,7 @@ const ContactPage = () => {
                                     <Phone className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
                                     <div>
                                         <div className="font-semibold text-gray-900 text-sm mb-1">Phone</div>
-                                        <div className="text-gray-600 text-sm">${process.env.NEXT_PUBLIC_SHOP_PHONE}</div>
+                                        <div className="text-gray-600 text-sm">{process.env.NEXT_PUBLIC_SHOP_PHONE}</div>
                                     </div>
                                 </div>
 

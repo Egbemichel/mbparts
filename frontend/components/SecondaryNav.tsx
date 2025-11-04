@@ -9,7 +9,6 @@ import SearchIcon from "@/public/icons/SearchIcon";
 import Image from "next/image";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import ArrowLeftIcon from '@/public/icons/ArrowLeftIcon';
-import ArrowRightIcon from '@/public/icons/ArrowRightIcon';
 
 interface Category {
     id: number;
@@ -54,9 +53,19 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
         setHasSearched,
         overlayRef,
         handleSearchOverlay,
+        loadAllSearchResults,
         showSearchOverlay,
         setShowSearchOverlay,
     } = useGlobalSearch();
+
+    // When the mobile overlay opens, fetch a larger page so the scrollable overlay can show more items.
+    React.useEffect(() => {
+        if (showSearchOverlay && !hasSearched) {
+            // Auto-load all search results into the overlay so the scrollable area shows everything.
+            // This follows next links or requests a large page size; may make multiple requests.
+            loadAllSearchResults();
+        }
+    }, [showSearchOverlay, hasSearched, loadAllSearchResults]);
 
     // Build dropdown items from categories
     const partsParent = categories.find((cat) => cat.slug === "parts");
@@ -327,18 +336,18 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
                                     <button className={`px-4 py-2 font-semibold ${activeTab === 'products' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700'}`} onClick={() => setActiveTab('products')}>Products</button>
                                     <button className={`px-4 py-2 font-semibold ${activeTab === 'categories' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700'}`} onClick={() => setActiveTab('categories')}>Categories</button>
                                 </div>
-                                <div className="min-h-[200px] flex flex-col items-center justify-center">
-                                    {/* Make results scrollable */}
-                                    <div className="w-full max-h-[70vh] overflow-y-auto">
+                                <div className="flex flex-col w-full max-h-[80vh]">
+                                    {/* Results scroll area */}
+                                    <div className="flex-1 w-full overflow-y-auto">
                                         {isLoading ? (
-                                            <div><LoadingSpinner /></div>
+                                            <div className="p-6"><LoadingSpinner /></div>
                                         ) : !hasSearched ? (
-                                            <Image src="/images/rafiki.svg" alt="Empty search" width={260} height={260} className="mb-4" />
+                                            <div className="p-6 flex justify-center"><Image src="/images/rafiki.svg" alt="Empty search" width={260} height={260} className="mb-4" /></div>
                                         ) : (
                                             <>
                                                 {activeTab === 'products' && (
                                                     <>
-                                                        <div className="w-full text-sm text-gray-600 mb-2">{searchResults.productCount} product{searchResults.productCount === 1 ? '' : 's'} found</div>
+                                                        <div className="w-full text-sm text-gray-600 mb-2 px-2">{searchResults.productCount} product{searchResults.productCount === 1 ? '' : 's'} found</div>
                                                         {searchResults.products.length > 0 ? (
                                                             <ul className="w-full">
                                                                 {searchResults.products.map((product: ProductResult) => (
@@ -361,12 +370,12 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
                                                                     </li>
                                                                 ))}
                                                             </ul>
-                                                        ) : <div className="text-gray-500">No products found.</div>}
+                                                        ) : <div className="text-gray-500 px-4">No products found.</div>}
                                                     </>
                                                 )}
                                                 {activeTab === 'categories' && (
                                                     <>
-                                                        <div className="w-full text-sm text-gray-600 mb-2">{searchResults.categoryCount} categor{searchResults.categoryCount === 1 ? 'y' : 'ies'} found</div>
+                                                        <div className="w-full text-sm text-gray-600 mb-2 px-2">{searchResults.categoryCount} categor{searchResults.categoryCount === 1 ? 'y' : 'ies'} found</div>
                                                         {searchResults.categories.length > 0 ? (
                                                             <ul className="w-full">
                                                                 {searchResults.categories.map((category: CategoryResult) => (
@@ -375,22 +384,34 @@ const SecondaryNav: React.FC<SecondaryNavProps> = ({
                                                                     </li>
                                                                 ))}
                                                             </ul>
-                                                        ) : <div className="text-gray-500">No categories found.</div>}
+                                                        ) : <div className="text-gray-500 px-4">No categories found.</div>}
                                                     </>
                                                 )}
                                             </>
                                         )}
                                     </div>
-                                    {/* Pagination controls always visible at bottom */}
-                                    <div className="flex justify-between mt-4 w-full overflow-x-auto flex-nowrap scrollbar-hide gap-2">
+
+                                    {/* Sticky footer so pagination/load-more is always visible */}
+                                    <div className="sticky bottom-0 bg-white py-3 flex justify-center gap-2 border-t">
                                         {searchResults.previous && (
-                                            <button className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center justify-center" onClick={() => handleSearchOverlay(undefined, searchResults.previous!)} disabled={isLoading} aria-label="Previous page">
+                                            <button
+                                                className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center justify-center mr-auto"
+                                                onClick={() => handleSearchOverlay(undefined, searchResults.previous!)}
+                                                disabled={isLoading}
+                                                aria-label="Previous page"
+                                            >
                                                 <ArrowLeftIcon className="w-5 h-5" />
                                             </button>
                                         )}
+
                                         {searchResults.next && (
-                                            <button className="px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center justify-center ml-auto" onClick={() => handleSearchOverlay(undefined, searchResults.next!)} disabled={isLoading} aria-label="Next page">
-                                                <ArrowRightIcon className="w-5 h-5" />
+                                            <button
+                                                className="px-4 py-2 bg-primary-50 text-white rounded hover:bg-primary-100"
+                                                onClick={() => handleSearchOverlay(undefined, searchResults.next!, undefined, true)}
+                                                disabled={isLoading}
+                                                aria-label="Load more results"
+                                            >
+                                                {isLoading ? 'Loading...' : 'Load more'}
                                             </button>
                                         )}
                                     </div>
