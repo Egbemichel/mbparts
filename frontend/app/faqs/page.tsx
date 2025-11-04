@@ -257,7 +257,7 @@ const ContactSection: React.FC = () => {
                         Contact Support
                     </button>
                     <button className="border border-gray-300 text-gray-700 px-8 py-3 rounded-md font-medium hover:bg-gray-50 transition-colors">
-                        Call Us: +1 (650) 431-7498
+                        Contact us: +1 (307) 224-8497
                     </button>
                 </div>
 

@@ -36,7 +36,7 @@ interface SecondaryNavProps {
 }
 
 const SecondaryNav: React.FC<SecondaryNavProps> = ({
-    phoneNumber = "+1 (650) 431-7498",
+    phoneNumber = `${process.env.NEXT_PUBLIC_SHOP_PHONE}`,
     categories,
 }) => {
     const [activeDropdown, setActiveDropdown] = React.useState<string | null>(null);

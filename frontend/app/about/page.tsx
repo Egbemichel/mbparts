@@ -278,7 +278,7 @@ const ContactSection: React.FC = () => {
         {
             icon: <Phone className="w-5 h-5" />,
             label: "Call Us",
-            value: "+1 (650) 431-7498"
+            value: `${process.env.NEXT_PUBLIC_SHOP_PHONE}`
         },
         {
             icon: <Mail className="w-5 h-5" />,
